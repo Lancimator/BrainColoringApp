@@ -28,10 +28,19 @@ class MainActivity : AppCompatActivity() {
 
         brainView.setFillListener { fills, secondsLeft ->
             runOnUiThread {
-                fillCounter.text = "Fills: $fills"
+                fillCounter.text = "Available fills: $fills"
                 fillTimer.text = "Next fill in: ${secondsLeft}s"
             }
         }
+        val rewiredStatus = findViewById<TextView>(R.id.rewiredStatus)
+
+        brainView.setRewiredListener { count ->
+            runOnUiThread {
+                rewiredStatus.text = "Brain cells rewired: $count out of 90"
+            }
+        }
+
+
         val resetButton = findViewById<Button>(R.id.resetButton)
 
         resetButton.setOnClickListener {

@@ -20,6 +20,12 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var availableFills = 1
     private var nextFillTime = 10
     private var fillCooldownMillis = 10_000L
+    private var rewiredCount = 0
+    private var rewiredListener: ((Int) -> Unit)? = null
+
+    fun setRewiredListener(listener: (Int) -> Unit) {
+        this.rewiredListener = listener
+    }
 
     private var fillListener: ((available: Int, nextInSec: Int) -> Unit)? = null
 
@@ -64,7 +70,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private fun loadSavedFills() {
         val lastTime = prefs.getLong(LAST_EXIT_TIME_KEY, -1L)
-        availableFills = prefs.getInt(FILL_COUNT_KEY, 3)
+        availableFills = prefs.getInt(FILL_COUNT_KEY, 1)
 
         if (lastTime != -1L) {
             val now = System.currentTimeMillis()
@@ -133,10 +139,12 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
                 if (isNotLine && isNotExcludedColor && availableFills > 0) {
                     availableFills--
+                    rewiredCount++
                     floodFill(mutableBitmap, touchX, touchY, targetColor, selectedColor)
                     saveColor(touchX, touchY, selectedColor)
                     invalidate()
                     fillListener?.invoke(availableFills, nextFillTime)
+                    rewiredListener?.invoke(rewiredCount)
                 }
 
 
@@ -148,10 +156,26 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
 
     fun resetImage() {
-        prefs.edit().clear().apply()
-        loadBitmap(applySavedColors = false)
+        // Clear saved color data and fill info
+        prefs.edit()
+            .clear()
+            .apply()
+
+        // Reset logic
+        availableFills = 1
+        nextFillTime = 10
+        rewiredCount = 0
+
+        // Reload a fresh, clean copy of the image
+        bitmap = BitmapFactory.decodeResource(resources, R.drawable.brain)
+        mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+
+        // Redraw and update UI
         invalidate()
+        fillListener?.invoke(availableFills, nextFillTime)
+        rewiredListener?.invoke(rewiredCount)
     }
+
 
 
     private fun saveColor(x: Int, y: Int, color: Int) {
