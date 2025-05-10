@@ -6,6 +6,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
+import android.os.Handler
+import android.os.Looper
 
 class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val LAST_EXIT_TIME_KEY = "last_exit_time"
@@ -33,7 +35,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         this.fillListener = listener
     }
 
-    private val timerHandler = android.os.Handler()
+    private val timerHandler = Handler(Looper.getMainLooper())
     private val fillRunnable = object : Runnable {
         override fun run() {
             nextFillTime -= 1
