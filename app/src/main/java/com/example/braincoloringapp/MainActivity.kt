@@ -9,8 +9,44 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.widget.TextView
+import com.airbnb.lottie.LottieAnimationView
+import android.view.View
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.Build
 
 class MainActivity : AppCompatActivity() {
+
+    private fun vibratePhone() {
+        val vibrator = getSystemService(Vibrator::class.java)
+        if (vibrator?.hasVibrator() == true) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val effect = VibrationEffect.createOneShot(
+                    500, // milliseconds
+                    VibrationEffect.DEFAULT_AMPLITUDE // or use 255 for max
+                )
+                vibrator.vibrate(effect)
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(500)
+            }
+        }
+    }
+
+
+
+    private fun showFireworks() {
+        val fireworkView = findViewById<LottieAnimationView>(R.id.fireworkView)
+        fireworkView.visibility = View.VISIBLE
+        fireworkView.playAnimation()
+
+        vibratePhone() // ✅ Add this line
+
+        fireworkView.postDelayed({
+            fireworkView.cancelAnimation()
+            fireworkView.visibility = View.GONE
+        }, 3000)
+    }
 
     private lateinit var brainView: BrainView
 
@@ -23,6 +59,17 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         brainView = findViewById(R.id.brainView)
+
+        val fireworkView = findViewById<LottieAnimationView>(R.id.fireworkView)
+
+        brainView.setCelebrationListener {
+            runOnUiThread {
+                showFireworks()
+            }
+        }
+
+
+
         val fillCounter = findViewById<TextView>(R.id.fillCounter)
         val fillTimer = findViewById<TextView>(R.id.fillTimer)
 

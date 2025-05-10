@@ -24,6 +24,8 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var fillCooldownMillis = 10_000L
     private var rewiredCount = 0
     private var rewiredListener: ((Int) -> Unit)? = null
+    private val REWIRED_COUNT_KEY = "rewired_count"
+
 
     fun setRewiredListener(listener: (Int) -> Unit) {
         this.rewiredListener = listener
@@ -33,6 +35,11 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     fun setFillListener(listener: (Int, Int) -> Unit) {
         this.fillListener = listener
+    }
+    private var celebrationListener: (() -> Unit)? = null
+
+    fun setCelebrationListener(listener: () -> Unit) {
+        celebrationListener = listener
     }
 
     private val timerHandler = Handler(Looper.getMainLooper())
@@ -59,8 +66,10 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         prefs.edit()
             .putInt(FILL_COUNT_KEY, availableFills)
             .putLong(LAST_EXIT_TIME_KEY, System.currentTimeMillis())
+            .putInt(REWIRED_COUNT_KEY, rewiredCount) // ✅ save rewired count
             .apply()
     }
+
 
     fun setSelectedColor(color: Int) {
         selectedColor = color
@@ -74,6 +83,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         val lastTime = prefs.getLong(LAST_EXIT_TIME_KEY, -1L)
         availableFills = prefs.getInt(FILL_COUNT_KEY, 1)
 
+
         if (lastTime != -1L) {
             val now = System.currentTimeMillis()
             val elapsedSeconds = ((now - lastTime) / 1000).toInt()
@@ -83,7 +93,8 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             availableFills += newFills
             nextFillTime = if (leftover == 0) 10 else 10 - leftover
         }
-
+        rewiredCount = prefs.getInt(REWIRED_COUNT_KEY, 0)
+        rewiredListener?.invoke(rewiredCount)
         fillListener?.invoke(availableFills, nextFillTime)
     }
 
@@ -147,7 +158,12 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                     invalidate()
                     fillListener?.invoke(availableFills, nextFillTime)
                     rewiredListener?.invoke(rewiredCount)
+
+                    if (rewiredCount == 5) {
+                        celebrationListener?.invoke()
+                    }
                 }
+
 
 
 
