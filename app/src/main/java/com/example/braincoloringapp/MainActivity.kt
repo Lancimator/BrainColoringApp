@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,12 +23,27 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         brainView = findViewById(R.id.brainView)
+        val fillCounter = findViewById<TextView>(R.id.fillCounter)
+        val fillTimer = findViewById<TextView>(R.id.fillTimer)
+
+        brainView.setFillListener { fills, secondsLeft ->
+            runOnUiThread {
+                fillCounter.text = "Fills: $fills"
+                fillTimer.text = "Next fill in: ${secondsLeft}s"
+            }
+        }
         val resetButton = findViewById<Button>(R.id.resetButton)
 
         resetButton.setOnClickListener {
             brainView.resetImage()
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        brainView.saveFillsOnExit()
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)

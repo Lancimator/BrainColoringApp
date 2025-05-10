@@ -8,6 +8,8 @@ import android.view.View
 import androidx.core.content.ContextCompat
 
 class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
+    private val LAST_EXIT_TIME_KEY = "last_exit_time"
+    private val FILL_COUNT_KEY = "fill_count"
     private var drawLeft = 0f
     private var drawTop = 0f
     private var drawScale = 1f
@@ -15,13 +17,66 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private lateinit var bitmap: Bitmap
     private lateinit var mutableBitmap: Bitmap
     private val prefs = context.getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+    private var availableFills = 1
+    private var nextFillTime = 10
+    private var fillCooldownMillis = 10_000L
+
+    private var fillListener: ((available: Int, nextInSec: Int) -> Unit)? = null
+
+    fun setFillListener(listener: (Int, Int) -> Unit) {
+        this.fillListener = listener
+    }
+
+    private val timerHandler = android.os.Handler()
+    private val fillRunnable = object : Runnable {
+        override fun run() {
+            nextFillTime -= 1
+            if (nextFillTime <= 0) {
+                availableFills++
+                nextFillTime = 10
+            }
+            fillListener?.invoke(availableFills, nextFillTime)
+
+            timerHandler.postDelayed(this, 1000)
+        }
+    }
 
     init {
         loadBitmap()
+        loadSavedFills()
+        startFillTimer()
+    }
+
+    fun saveFillsOnExit() {
+        prefs.edit()
+            .putInt(FILL_COUNT_KEY, availableFills)
+            .putLong(LAST_EXIT_TIME_KEY, System.currentTimeMillis())
+            .apply()
     }
 
     fun setSelectedColor(color: Int) {
         selectedColor = color
+    }
+
+    private fun startFillTimer() {
+        timerHandler.post(fillRunnable)
+    }
+
+    private fun loadSavedFills() {
+        val lastTime = prefs.getLong(LAST_EXIT_TIME_KEY, -1L)
+        availableFills = prefs.getInt(FILL_COUNT_KEY, 3)
+
+        if (lastTime != -1L) {
+            val now = System.currentTimeMillis()
+            val elapsedSeconds = ((now - lastTime) / 1000).toInt()
+            val newFills = elapsedSeconds / 10
+            val leftover = elapsedSeconds % 10
+
+            availableFills += newFills
+            nextFillTime = if (leftover == 0) 10 else 10 - leftover
+        }
+
+        fillListener?.invoke(availableFills, nextFillTime)
     }
 
 
@@ -76,12 +131,14 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 val isNotLine = targetColor != Color.BLACK
                 val isNotExcludedColor = !(r == 254 && g == 255 && b == 255)
 
-                if (isNotLine && isNotExcludedColor) {
+                if (isNotLine && isNotExcludedColor && availableFills > 0) {
+                    availableFills--
                     floodFill(mutableBitmap, touchX, touchY, targetColor, selectedColor)
                     saveColor(touchX, touchY, selectedColor)
-
                     invalidate()
+                    fillListener?.invoke(availableFills, nextFillTime)
                 }
+
 
 
             }
