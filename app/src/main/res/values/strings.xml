@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">90-days brain rewiring</string>
-    <!-- at the end of the <resources> block -->
     <string name="halls_of_fame">Halls of Fame</string>
     <string name="reset">Reset</string>
     <string name="achievements">Achievements</string>
+    <string name="halls_of_fame_message">
+        Your rewiring journey ended after %1$d fills on %2$s. Next time you will make it longer!
+    </string>
+
 </resources>

@@ -15,7 +15,11 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.Build
 import android.content.Intent
-
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import android.content.Context
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -69,7 +73,15 @@ class MainActivity : AppCompatActivity() {
                 showFireworks()
             }
         }
+        val hallsOfFameButton = findViewById<Button>(R.id.hallsOfFameButton)
+        hallsOfFameButton.setOnClickListener {
+            // quick sanity check:
+           // Toast.makeText(this, "Halls of Fame clicked!", Toast.LENGTH_SHORT).show()
 
+            // then launch the activity
+            val intent = Intent(this, HallsOfFameActivity::class.java)
+            startActivity(intent)
+        }
         findViewById<Button>(R.id.achievementsButton).setOnClickListener {
             val intent = Intent(this, AchievementsActivity::class.java)
             intent.putExtra("rewiredCount", brainView.getRewiredCount())
@@ -99,13 +111,22 @@ class MainActivity : AppCompatActivity() {
         val resetButton = findViewById<Button>(R.id.resetButton)
 
         resetButton.setOnClickListener {
+            // 1) Grab the final fill count and date
+            val fills = brainView.getRewiredCount()
+            val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            val endDate = dateFormat.format(Date())
+
+            // 2) Store them in prefs
+            val hofPrefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
+            hofPrefs.edit()
+                .putInt("last_fill_count", fills)
+                .putString("last_end_date", endDate)
+                .apply()
+
+            // 3) Now actually reset the view
             brainView.resetImage()
-        }
-        // find the new button
-        val hallsOfFameButton = findViewById<Button>(R.id.hallsOfFameButton)
-        hallsOfFameButton.setOnClickListener {
-            val intent = Intent(this, HallsOfFameActivity::class.java)
-            startActivity(intent)
+
+            // (Any other UI resets you had…)
         }
 
     }
