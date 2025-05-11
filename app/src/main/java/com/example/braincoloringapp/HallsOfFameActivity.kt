@@ -10,19 +10,13 @@ class HallsOfFameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_halls_of_fame)
 
-        // pull stored stats
+        // pull the full log
         val prefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
-        val lastFills = prefs.getInt("last_fill_count", 0)
-        val lastEndDate = prefs.getString("last_end_date", "") ?: ""
+        val hofLog = prefs.getString("hof_log", "") ?: ""
 
-        // if we have real data, show it
-        if (lastFills > 0 && lastEndDate.isNotEmpty()) {
-            val message = getString(
-                R.string.halls_of_fame_message,
-                lastFills,
-                lastEndDate
-            )
-            findViewById<TextView>(R.id.hallsOfFameMessage).text = message
+        // dump it into the TextView
+        findViewById<TextView>(R.id.hallsOfFameMessage).apply {
+            text = hofLog
         }
     }
 }

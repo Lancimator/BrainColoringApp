@@ -116,18 +116,31 @@ class MainActivity : AppCompatActivity() {
             val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             val endDate = dateFormat.format(Date())
 
-            // 2) Store them in prefs
+            // 2) Build the new entry
+            val newEntry = getString(
+                R.string.halls_of_fame_message,
+                fills,
+                endDate
+            )
+
+            // 3) Prepend it to the existing log
             val hofPrefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
+            val oldLog = hofPrefs.getString("hof_log", "") ?: ""
+            val updatedLog = if (oldLog.isNotEmpty()) {
+                "$newEntry\n\n$oldLog"
+            } else {
+                newEntry
+            }
+
+            // 4) Save the combined log
             hofPrefs.edit()
-                .putInt("last_fill_count", fills)
-                .putString("last_end_date", endDate)
+                .putString("hof_log", updatedLog)
                 .apply()
 
-            // 3) Now actually reset the view
+            // 5) Finally, clear the brain view
             brainView.resetImage()
-
-            // (Any other UI resets you had…)
         }
+
 
     }
 
