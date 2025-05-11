@@ -1,5 +1,6 @@
 package com.example.braincoloringapp
 
+import com.example.braincoloringapp.ACHIEVEMENTS
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
@@ -27,11 +28,12 @@ import com.example.braincoloringapp.FILL_INTERVAL_SECONDS
 class MainActivity : AppCompatActivity() {
     // keep track of which thresholds we’ve celebrated
     private val unlockedThresholds = mutableSetOf<Int>()
-
     // these need to be class properties so performHardReset() can see them:
     private lateinit var rewiredStatus: TextView
     private lateinit var fillCounter: TextView
     private lateinit var fillTimer: TextView
+    private lateinit var rankTitle: TextView
+    private lateinit var rankDesc: TextView
 
     private fun vibratePhone() {
         val vibrator = getSystemService(Vibrator::class.java)
@@ -83,12 +85,40 @@ class MainActivity : AppCompatActivity() {
         rewiredStatus.text = "Brain cells rewired: 0"
         fillCounter.text     = "Available fills: 0"
         fillTimer.text       = "Next fill in: ${FILL_INTERVAL_SECONDS}s"
+        unlockedThresholds.clear()
+        updateRank()
     }
+
+    /**
+     * Chooses a rank string based on how many achievements we’ve unlocked
+     * (0→Initiate, 1→Apprentice, …, 7→Deity; if >7, stays at Deity).
+     */
+    private fun updateRank() {
+        // load the full “Rank – Description” strings
+        val ranks = resources.getStringArray(R.array.ranks)
+        val count = unlockedThresholds.size
+        val index = count.coerceIn(0, ranks.size - 1)
+        val fullText = ranks[index]
+
+        // split on the dash “–”
+        val parts = fullText.split("–", limit = 2)
+        val titleText = parts[0].trim()         // e.g. “Initiate”
+        val descText  = if (parts.size > 1)
+            parts[1].trim()    // e.g. “Just getting started…”
+        else
+            ""
+
+        rankTitle.text = titleText
+        rankDesc.text  = descText
+    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        rankTitle = findViewById(R.id.rankTitle)
+        rankDesc  = findViewById(R.id.rankDesc)
         // existing binding
         brainView = findViewById(R.id.brainView)
 
@@ -177,10 +207,21 @@ class MainActivity : AppCompatActivity() {
         val rewiredStatus = findViewById<TextView>(R.id.rewiredStatus)
 
         brainView.setRewiredListener { count ->
-            runOnUiThread {
-                rewiredStatus.text = "Brain cells rewired: $count out of 90"
+            rewiredStatus.text = "Rewired: $count"
+
+            // For each Achievement object…
+            ACHIEVEMENTS.forEach { achievement ->
+                // Compare against its threshold, and if newly unlocked, show fireworks
+                if (count >= achievement.threshold && unlockedThresholds.add(achievement.threshold)) {
+                    showFireworks()
+                }
             }
+
+            // Update your rank or whatever next…
+            updateRank()
         }
+
+
 
 
         val resetButton = findViewById<Button>(R.id.resetButton)
@@ -214,8 +255,20 @@ class MainActivity : AppCompatActivity() {
 
             // 5) Finally, clear the brain view
             brainView.resetImage()
+
+            // 6) Clear in-memory achievements so we go back to “Initiate”
+            unlockedThresholds.clear()
+
+            // 7) Force the rank TextViews to re-compute (calls updateRank())
+            updateRank()
+
         }
 
+        unlockedThresholds.clear()
+        updateRank()
+
+// show the initial rank (probably “Initiate”)
+        updateRank()
 
     }
 

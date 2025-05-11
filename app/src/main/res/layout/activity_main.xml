@@ -47,6 +47,37 @@
         android:textSize="18sp"
         android:textColor="@android:color/black"/>
 
+    <!-- NEW: container for your rank title+desc -->
+    <LinearLayout
+        android:id="@+id/rankContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rewiredStatus"
+        android:layout_marginTop="40dp"
+        android:orientation="vertical"
+        android:gravity="center">
+
+    <!-- 1) Big first word -->
+    <TextView
+        android:id="@+id/rankTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text=""/>
+
+    <!-- 2) Smaller description on next line -->
+    <TextView
+        android:id="@+id/rankDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:text=""/>
+
+</LinearLayout>
 
     <!-- BrainView below the toolbar -->
     <com.example.braincoloringapp.BrainView
