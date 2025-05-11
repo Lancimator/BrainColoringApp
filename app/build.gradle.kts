@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.braincoloringapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.braincoloringapp"
-        minSdk = 21
-        targetSdk = 34
+        minSdk = 23
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -39,4 +39,5 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
     implementation("com.airbnb.android:lottie:6.3.0")
+    implementation(libs.androidx.activity)
 }

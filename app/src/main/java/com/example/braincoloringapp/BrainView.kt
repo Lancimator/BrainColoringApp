@@ -70,6 +70,10 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             .apply()
     }
 
+    fun getRewiredCount(): Int {
+        return rewiredCount
+    }
+
 
     fun setSelectedColor(color: Int) {
         selectedColor = color
@@ -178,6 +182,8 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         prefs.edit()
             .clear()
             .apply()
+        prefs.edit().remove(REWIRED_COUNT_KEY).apply()
+
 
         // Reset logic
         availableFills = 1

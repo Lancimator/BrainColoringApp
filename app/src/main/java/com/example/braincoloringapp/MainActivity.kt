@@ -14,6 +14,7 @@ import android.view.View
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.Build
+import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
 
@@ -66,6 +67,12 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 showFireworks()
             }
+        }
+
+        findViewById<Button>(R.id.achievementsButton).setOnClickListener {
+            val intent = Intent(this, AchievementsActivity::class.java)
+            intent.putExtra("rewiredCount", brainView.getRewiredCount())
+            startActivity(intent)
         }
 
 
