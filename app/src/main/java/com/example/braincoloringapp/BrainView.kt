@@ -8,6 +8,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import android.os.Handler
 import android.os.Looper
+const val FILL_INTERVAL_SECONDS = 3
 
 class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val LAST_EXIT_TIME_KEY = "last_exit_time"
@@ -20,7 +21,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private lateinit var mutableBitmap: Bitmap
     private val prefs = context.getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
     private var availableFills = 1
-    private var nextFillTime = 10
+    private var nextFillTime = FILL_INTERVAL_SECONDS
     private var fillCooldownMillis = 10_000L
     private var rewiredCount = 0
     private var rewiredListener: ((Int) -> Unit)? = null
@@ -48,7 +49,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             nextFillTime -= 1
             if (nextFillTime <= 0) {
                 availableFills++
-                nextFillTime = 10
+                nextFillTime = FILL_INTERVAL_SECONDS
             }
             fillListener?.invoke(availableFills, nextFillTime)
 
@@ -91,11 +92,11 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         if (lastTime != -1L) {
             val now = System.currentTimeMillis()
             val elapsedSeconds = ((now - lastTime) / 1000).toInt()
-            val newFills = elapsedSeconds / 10
-            val leftover = elapsedSeconds % 10
+            val newFills = elapsedSeconds / FILL_INTERVAL_SECONDS
+            val leftover = elapsedSeconds % FILL_INTERVAL_SECONDS
 
             availableFills += newFills
-            nextFillTime = if (leftover == 0) 10 else 10 - leftover
+            nextFillTime = if (leftover == 0) FILL_INTERVAL_SECONDS else FILL_INTERVAL_SECONDS - leftover
         }
         rewiredCount = prefs.getInt(REWIRED_COUNT_KEY, 0)
         rewiredListener?.invoke(rewiredCount)
@@ -187,7 +188,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
         // Reset logic
         availableFills = 1
-        nextFillTime = 10
+        nextFillTime = FILL_INTERVAL_SECONDS
         rewiredCount = 0
 
         // Reload a fresh, clean copy of the image
