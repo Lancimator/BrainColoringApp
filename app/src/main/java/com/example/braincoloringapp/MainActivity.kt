@@ -207,7 +207,7 @@ class MainActivity : AppCompatActivity() {
         val rewiredStatus = findViewById<TextView>(R.id.rewiredStatus)
 
         brainView.setRewiredListener { count ->
-            rewiredStatus.text = "Rewired: $count"
+            rewiredStatus.text = "Brain cells rewired: $count"
 
             // For each Achievement object…
             ACHIEVEMENTS.forEach { achievement ->
