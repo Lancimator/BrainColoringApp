@@ -153,12 +153,14 @@ class MainActivity : AppCompatActivity() {
                         // TODO: launch settings screen
                         true
                     }
-                    R.id.action_help -> {
-                        // TODO: show help dialog
+                    R.id.brain90 -> {
+                        // load the 90-day brain image
+                        brainView.setBaseImageResource(R.drawable.brain_90)
                         true
                     }
-                    R.id.action_about -> {
-                        // TODO: show about
+                    R.id.brain45 -> {
+                        // load the 45-day brain image
+                        brainView.setBaseImageResource(R.drawable.brain_45)
                         true
                     }
                     R.id.action_hard_reset -> {

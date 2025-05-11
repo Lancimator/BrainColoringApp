@@ -7,6 +7,9 @@ import android.view.MotionEvent
 import android.view.View
 import android.os.Handler
 import android.os.Looper
+import android.graphics.BitmapFactory
+import androidx.annotation.DrawableRes
+
 const val FILL_INTERVAL_SECONDS = 3
 
 class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
@@ -242,4 +245,20 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             stack.add(Point(cx, cy - 1))
         }
     }
+    /**
+     * Replace the current base image with the given drawable resource
+     * (and clear any saved “fills” on top of it).
+     */
+    fun setBaseImageResource(@DrawableRes resId: Int) {
+        // 1) decode the new bitmap
+        val newBmp = BitmapFactory.decodeResource(context.resources, resId)
+        // 2) overwrite our backing bitmaps
+        bitmap = newBmp
+        mutableBitmap = newBmp.copy(Bitmap.Config.ARGB_8888, true)
+        // 3) clear any saved color data
+        loadSavedFills()      // or however you repopulate from prefs; if you want blank, skip this
+        // 4) redraw
+        invalidate()
+    }
+
 }

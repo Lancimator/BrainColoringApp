@@ -4,10 +4,10 @@
     <!-- existing items -->
 
     <item
-        android:id="@+id/action_help"
+        android:id="@+id/brain90"
         android:title="@string/menu_90_day"/>
     <item
-        android:id="@+id/action_about"
+        android:id="@+id/brain45"
         android:title="@string/menu_45_day"/>
     <item
         android:id="@+id/action_settings"
