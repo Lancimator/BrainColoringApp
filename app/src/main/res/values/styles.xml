@@ -8,7 +8,9 @@
         <!-- e.g. if you already had colors, uncomment & adjust:
         <item name="colorPrimary">@color/your_primary</item>
         <item name="colorPrimaryDark">@color/your_primary_dark</item>
-        <item name="colorAccent">@color/your_accent</item>
-        -->
+        <item name="colorAccent">@color/your_accent</item>-->
+        <item name="android:windowBackground">@color/activity_background</item>
+
+
     </style>
 </resources>

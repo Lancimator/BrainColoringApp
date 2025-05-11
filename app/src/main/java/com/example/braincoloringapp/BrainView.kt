@@ -153,7 +153,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 val b = Color.blue(targetColor)
 
                 val isNotLine = targetColor != Color.BLACK
-                val isNotExcludedColor = !(r == 254 && g == 255 && b == 255)
+                val isNotExcludedColor = !(r == 223 && g == 200 && b == 200)
 
                 if (isNotLine && isNotExcludedColor && availableFills > 0) {
                     availableFills--
