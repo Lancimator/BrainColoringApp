@@ -20,6 +20,8 @@ import java.util.Date
 import java.util.Locale
 import android.content.Context
 import android.widget.Toast
+import android.widget.ImageView
+import androidx.appcompat.widget.PopupMenu
 
 class MainActivity : AppCompatActivity() {
 
@@ -73,6 +75,31 @@ class MainActivity : AppCompatActivity() {
             setDisplayShowTitleEnabled(false)
             setDisplayShowCustomEnabled(true)
             setCustomView(R.layout.actionbar_custom_title)
+        }
+        // 2) Find the menu icon and attach a PopupMenu
+        val menuIcon = supportActionBar?.customView
+            ?.findViewById<ImageView>(R.id.menuIcon)
+        menuIcon?.setOnClickListener { anchor ->
+            val popup = PopupMenu(this, anchor)
+            popup.menuInflater.inflate(R.menu.toolbar_menu, popup.menu)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.action_settings -> {
+                        // TODO: launch settings screen
+                        true
+                    }
+                    R.id.action_help -> {
+                        // TODO: show help dialog
+                        true
+                    }
+                    R.id.action_about -> {
+                        // TODO: show about
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
         }
         val hallsOfFameButton = findViewById<Button>(R.id.hallsOfFameButton)
         hallsOfFameButton.setOnClickListener {

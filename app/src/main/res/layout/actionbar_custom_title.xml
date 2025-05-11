@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/actionbarTitle"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:text="@string/app_name"
-    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-    android:textColor="@android:color/white"/>
+    android:layout_height="?attr/actionBarSize">
+
+    <!-- 1) Left-side menu icon -->
+    <ImageView
+        android:id="@+id/menuIcon"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_menu"
+        android:contentDescription="@string/menu"
+        android:padding="8dp"
+        android:layout_gravity="start|center_vertical"/>
+
+    <!-- 2) Centered title -->
+    <TextView
+        android:id="@+id/actionbarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="?attr/actionBarSize"
+        android:layout_marginEnd="?attr/actionBarSize"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+        android:textColor="@android:color/white"/>
+</FrameLayout>
