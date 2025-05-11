@@ -2,16 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- existing items -->
+
+    <item
+        android:id="@+id/action_help"
+        android:title="@string/menu_90_day"/>
+    <item
+        android:id="@+id/action_about"
+        android:title="@string/menu_45_day"/>
     <item
         android:id="@+id/action_settings"
         android:title="Settings"/>
-    <item
-        android:id="@+id/action_help"
-        android:title="Help"/>
-    <item
-        android:id="@+id/action_about"
-        android:title="About"/>
-
     <!-- new Hard Reset item -->
     <item
         android:id="@+id/action_hard_reset"

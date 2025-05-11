@@ -154,8 +154,9 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
                 val isNotLine = targetColor != Color.BLACK
                 val isNotExcludedColor = !(r == 223 && g == 200 && b == 200)
+                val iswhite = (r == 255 && g == 255 && b == 255)
 
-                if (isNotLine && isNotExcludedColor && availableFills > 0) {
+                if (isNotLine && isNotExcludedColor && iswhite && availableFills > 0) {
                     availableFills--
                     rewiredCount++
                     floodFill(mutableBitmap, touchX, touchY, targetColor, selectedColor)
