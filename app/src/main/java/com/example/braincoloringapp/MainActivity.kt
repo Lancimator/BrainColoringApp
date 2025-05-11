@@ -60,10 +60,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Set up the toolbar for the menu
-        val toolbar = findViewById<Toolbar>(R.id.main_toolbar)
-        setSupportActionBar(toolbar)
-
         brainView = findViewById(R.id.brainView)
 
         val fireworkView = findViewById<LottieAnimationView>(R.id.fireworkView)

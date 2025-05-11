@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Your app-wide theme, with the standard ActionBar ("DarkActionBar").
+      You can keep any colorPrimary / accent items you already had.
+    -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- e.g. if you already had colors, uncomment & adjust:
+        <item name="colorPrimary">@color/your_primary</item>
+        <item name="colorPrimaryDark">@color/your_primary_dark</item>
+        <item name="colorAccent">@color/your_accent</item>
+        -->
+    </style>
+</resources>
