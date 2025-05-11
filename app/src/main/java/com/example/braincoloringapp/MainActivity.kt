@@ -22,8 +22,16 @@ import android.content.Context
 import android.widget.Toast
 import android.widget.ImageView
 import androidx.appcompat.widget.PopupMenu
+import com.example.braincoloringapp.FILL_INTERVAL_SECONDS
 
 class MainActivity : AppCompatActivity() {
+    // keep track of which thresholds we’ve celebrated
+    private val unlockedThresholds = mutableSetOf<Int>()
+
+    // these need to be class properties so performHardReset() can see them:
+    private lateinit var rewiredStatus: TextView
+    private lateinit var fillCounter: TextView
+    private lateinit var fillTimer: TextView
 
     private fun vibratePhone() {
         val vibrator = getSystemService(Vibrator::class.java)
@@ -58,9 +66,36 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var brainView: BrainView
 
+    private fun performHardReset() {
+        // a) Clear all BrainPrefs (fills, rewired count, timers, saved colors, etc)
+        getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+            .edit().clear().apply()
+
+        // b) Clear Halls of Fame log
+        getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
+            .edit().clear().apply()
+
+        // c) Clear any in-memory milestones so fireworks can re-fire
+        unlockedThresholds.clear()
+
+        // d) Reset the view and UI
+        brainView.resetImage()
+        rewiredStatus.text = "Brain cells rewired: 0"
+        fillCounter.text     = "Available fills: 0"
+        fillTimer.text       = "Next fill in: ${FILL_INTERVAL_SECONDS}s"
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        // existing binding
+        brainView = findViewById(R.id.brainView)
+
+// new bindings
+        rewiredStatus = findViewById(R.id.rewiredStatus)
+        fillCounter    = findViewById(R.id.fillCounter)
+        fillTimer      = findViewById(R.id.fillTimer)
 
         brainView = findViewById(R.id.brainView)
 
@@ -94,6 +129,18 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.action_about -> {
                         // TODO: show about
+                        true
+                    }
+                    R.id.action_hard_reset -> {
+                        // 1) Show confirmation dialog
+                        AlertDialog.Builder(this)
+                            .setTitle("Hard Reset")
+                            .setMessage("Are you sure you want to reset everything? It resets Halls of Fame, Achievements, current Status")
+                            .setPositiveButton("Yes") { dialog, which ->
+                                performHardReset()
+                            }
+                            .setNegativeButton("No", null)
+                            .show()
                         true
                     }
                     else -> false

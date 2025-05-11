@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- existing items -->
     <item
         android:id="@+id/action_settings"
         android:title="Settings"/>
@@ -9,4 +11,9 @@
     <item
         android:id="@+id/action_about"
         android:title="About"/>
+
+    <!-- new Hard Reset item -->
+    <item
+        android:id="@+id/action_hard_reset"
+        android:title="Hard Reset"/>
 </menu>
