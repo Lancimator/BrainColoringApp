@@ -55,22 +55,36 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- existing Reset button -->
     <Button
         android:id="@+id/resetButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reset"
+        android:text="@string/reset"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"/>
+
+    <!-- new Halls of Fame button -->
+    <Button
+        android:id="@+id/hallsOfFameButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/halls_of_fame"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="16dp"/>
+
+    <!-- existing Achievements button -->
     <Button
         android:id="@+id/achievementsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Achievements"
+        android:text="@string/achievements"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"/>
+
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/fireworkView"

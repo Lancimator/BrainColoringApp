@@ -16,6 +16,7 @@ import android.os.Vibrator
 import android.os.Build
 import android.content.Intent
 
+
 class MainActivity : AppCompatActivity() {
 
     private fun vibratePhone() {
@@ -100,6 +101,13 @@ class MainActivity : AppCompatActivity() {
         resetButton.setOnClickListener {
             brainView.resetImage()
         }
+        // find the new button
+        val hallsOfFameButton = findViewById<Button>(R.id.hallsOfFameButton)
+        hallsOfFameButton.setOnClickListener {
+            val intent = Intent(this, HallsOfFameActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     override fun onPause() {
