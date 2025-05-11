@@ -28,11 +28,12 @@ import com.example.braincoloringapp.FILL_INTERVAL_SECONDS
 class MainActivity : AppCompatActivity() {
     // keep track of which thresholds we’ve celebrated
     private val unlockedThresholds = mutableSetOf<Int>()
-    private lateinit var rankText: TextView
     // these need to be class properties so performHardReset() can see them:
     private lateinit var rewiredStatus: TextView
     private lateinit var fillCounter: TextView
     private lateinit var fillTimer: TextView
+    private lateinit var rankTitle: TextView
+    private lateinit var rankDesc: TextView
 
     private fun vibratePhone() {
         val vibrator = getSystemService(Vibrator::class.java)
@@ -93,17 +94,31 @@ class MainActivity : AppCompatActivity() {
      * (0→Initiate, 1→Apprentice, …, 7→Deity; if >7, stays at Deity).
      */
     private fun updateRank() {
+        // load the full “Rank – Description” strings
         val ranks = resources.getStringArray(R.array.ranks)
         val count = unlockedThresholds.size
-        val index = if (count in ranks.indices) count else ranks.size - 1
-        rankText.text = ranks[index]
+        val index = count.coerceIn(0, ranks.size - 1)
+        val fullText = ranks[index]
+
+        // split on the dash “–”
+        val parts = fullText.split("–", limit = 2)
+        val titleText = parts[0].trim()         // e.g. “Initiate”
+        val descText  = if (parts.size > 1)
+            parts[1].trim()    // e.g. “Just getting started…”
+        else
+            ""
+
+        rankTitle.text = titleText
+        rankDesc.text  = descText
     }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        rankText       = findViewById(R.id.rankText)
+        rankTitle = findViewById(R.id.rankTitle)
+        rankDesc  = findViewById(R.id.rankDesc)
         // existing binding
         brainView = findViewById(R.id.brainView)
 
@@ -240,6 +255,13 @@ class MainActivity : AppCompatActivity() {
 
             // 5) Finally, clear the brain view
             brainView.resetImage()
+
+            // 6) Clear in-memory achievements so we go back to “Initiate”
+            unlockedThresholds.clear()
+
+            // 7) Force the rank TextViews to re-compute (calls updateRank())
+            updateRank()
+
         }
 
         unlockedThresholds.clear()
