@@ -69,6 +69,11 @@ class MainActivity : AppCompatActivity() {
                 showFireworks()
             }
         }
+        supportActionBar?.apply {
+            setDisplayShowTitleEnabled(false)
+            setDisplayShowCustomEnabled(true)
+            setCustomView(R.layout.actionbar_custom_title)
+        }
         val hallsOfFameButton = findViewById<Button>(R.id.hallsOfFameButton)
         hallsOfFameButton.setOnClickListener {
             // quick sanity check:
