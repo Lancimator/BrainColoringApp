@@ -5,7 +5,6 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import androidx.core.content.ContextCompat
 import android.os.Handler
 import android.os.Looper
 const val FILL_INTERVAL_SECONDS = 3
@@ -105,7 +104,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
 
     private fun loadBitmap(applySavedColors: Boolean = true) {
-        bitmap = BitmapFactory.decodeResource(resources, R.drawable.brain)
+        bitmap = BitmapFactory.decodeResource(resources, R.drawable.brain_90)
         mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
         if (applySavedColors) {
             loadColors()
@@ -193,7 +192,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         rewiredCount = 0
 
         // Reload a fresh, clean copy of the image
-        bitmap = BitmapFactory.decodeResource(resources, R.drawable.brain)
+        bitmap = BitmapFactory.decodeResource(resources, R.drawable.brain_90)
         mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
 
         // Redraw and update UI
