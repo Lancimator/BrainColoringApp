@@ -31,7 +31,9 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     // which drawable is currently loaded
     private var currentResId: Int = R.drawable.brain_90
 
-
+    /** helper to namespace all keys by image */
+    private fun keyFor(imageKey: String) =
+        "${currentResId}_$imageKey"
 
     fun setRewiredListener(listener: (Int) -> Unit) {
         this.rewiredListener = listener
@@ -70,9 +72,9 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     fun saveFillsOnExit() {
         prefs.edit()
-            .putInt(FILL_COUNT_KEY, availableFills)
-            .putLong(LAST_EXIT_TIME_KEY, System.currentTimeMillis())
-            .putInt(REWIRED_COUNT_KEY, rewiredCount) // ✅ save rewired count
+            .putInt(   keyFor(FILL_COUNT_KEY),    availableFills)
+            .putLong(  keyFor(LAST_EXIT_TIME_KEY), System.currentTimeMillis())
+            .putInt(   keyFor(REWIRED_COUNT_KEY), rewiredCount)
             .apply()
     }
 
@@ -90,8 +92,8 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     private fun loadSavedFills() {
-        val lastTime = prefs.getLong(LAST_EXIT_TIME_KEY, -1L)
-        availableFills = prefs.getInt(FILL_COUNT_KEY, 1)
+        val lastTime = prefs.getLong(   keyFor(LAST_EXIT_TIME_KEY), -1L)
+        availableFills = prefs.getInt(  keyFor(FILL_COUNT_KEY),     1)
 
 
         if (lastTime != -1L) {
@@ -103,7 +105,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             availableFills += newFills
             nextFillTime = if (leftover == 0) FILL_INTERVAL_SECONDS else FILL_INTERVAL_SECONDS - leftover
         }
-        rewiredCount = prefs.getInt(REWIRED_COUNT_KEY, 0)
+        rewiredCount = prefs.getInt(   keyFor(REWIRED_COUNT_KEY),    0)
         rewiredListener?.invoke(rewiredCount)
         fillListener?.invoke(availableFills, nextFillTime)
     }
@@ -219,25 +221,23 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private fun loadColors() {
         for ((key, value) in prefs.all) {
-            // keys are now "resId_x_y"
             val parts = key.split("_")
+            // expect “resId_x_y”
             if (parts.size == 3) {
                 val resIdKey = parts[0].toIntOrNull()
                 val x = parts[1].toIntOrNull()
                 val y = parts[2].toIntOrNull()
-                val c = (value as? Int)
-
-                if (resIdKey == currentResId && x != null && y != null && c != null) {
-                    // re‐paint exactly as before
+                if (resIdKey == currentResId && x != null && y != null) {
                     floodFill(
                         mutableBitmap,
                         x, y,
                         mutableBitmap.getPixel(x, y),
-                        c
+                        (value as Int)
                     )
                 }
             }
         }
+
     }
 
 
@@ -268,20 +268,22 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
      * (and clear any saved “fills” on top of it).
      */
     fun setBaseImageResource(@DrawableRes resId: Int) {
-        // 1) remember which image we’re on
+        // 1) remember which image
         currentResId = resId
 
-        // 2) decode and reset our bitmaps
+        // 2) decode new bitmaps
         val newBmp = BitmapFactory.decodeResource(context.resources, resId)
         bitmap = newBmp
         mutableBitmap = newBmp.copy(Bitmap.Config.ARGB_8888, true)
 
-        // 3) repopulate this image’s saved paints
-        loadColors()
+        // 3) reload per-image state
+        loadSavedFills()  // fills, timer and rewired count
+        loadColors()      // pixel paints
 
-        // 4) ensure UI updates
+        // 4) refresh view
         invalidate()
     }
+
 
 
 }
