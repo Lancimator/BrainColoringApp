@@ -28,6 +28,9 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var rewiredCount = 0
     private var rewiredListener: ((Int) -> Unit)? = null
     private val REWIRED_COUNT_KEY = "rewired_count"
+    // which drawable is currently loaded
+    private var currentResId: Int = R.drawable.brain_90
+
 
 
     fun setRewiredListener(listener: (Int) -> Unit) {
@@ -207,21 +210,36 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
 
     private fun saveColor(x: Int, y: Int, color: Int) {
-        prefs.edit().putInt("${x}_${y}", color).apply()
+        // include the image ID in the key
+        prefs.edit()
+            .putInt("${currentResId}_${x}_${y}", color)
+            .apply()
+
     }
 
     private fun loadColors() {
         for ((key, value) in prefs.all) {
-            val coords = key.split("_")
-            if (coords.size == 2) {
-                val x = coords[0].toIntOrNull()
-                val y = coords[1].toIntOrNull()
-                if (x != null && y != null) {
-                    floodFill(mutableBitmap, x, y, mutableBitmap.getPixel(x, y), value as Int)
+            // keys are now "resId_x_y"
+            val parts = key.split("_")
+            if (parts.size == 3) {
+                val resIdKey = parts[0].toIntOrNull()
+                val x = parts[1].toIntOrNull()
+                val y = parts[2].toIntOrNull()
+                val c = (value as? Int)
+
+                if (resIdKey == currentResId && x != null && y != null && c != null) {
+                    // re‐paint exactly as before
+                    floodFill(
+                        mutableBitmap,
+                        x, y,
+                        mutableBitmap.getPixel(x, y),
+                        c
+                    )
                 }
             }
         }
     }
+
 
     private fun floodFill(bmp: Bitmap, x: Int, y: Int, targetColor: Int, replacementColor: Int) {
         if (targetColor == replacementColor) return
@@ -250,15 +268,20 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
      * (and clear any saved “fills” on top of it).
      */
     fun setBaseImageResource(@DrawableRes resId: Int) {
-        // 1) decode the new bitmap
+        // 1) remember which image we’re on
+        currentResId = resId
+
+        // 2) decode and reset our bitmaps
         val newBmp = BitmapFactory.decodeResource(context.resources, resId)
-        // 2) overwrite our backing bitmaps
         bitmap = newBmp
         mutableBitmap = newBmp.copy(Bitmap.Config.ARGB_8888, true)
-        // 3) clear any saved color data
-        loadSavedFills()      // or however you repopulate from prefs; if you want blank, skip this
-        // 4) redraw
+
+        // 3) repopulate this image’s saved paints
+        loadColors()
+
+        // 4) ensure UI updates
         invalidate()
     }
+
 
 }
