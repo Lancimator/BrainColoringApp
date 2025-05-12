@@ -268,6 +268,8 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
      * (and clear any saved “fills” on top of it).
      */
     fun setBaseImageResource(@DrawableRes resId: Int) {
+        // **1) save the current brain’s fills, timer & rewired count**
+        saveFillsOnExit()
         // 1) remember which image
         currentResId = resId
 
