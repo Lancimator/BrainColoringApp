@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fillTimer: TextView
     private lateinit var rankTitle: TextView
     private lateinit var rankDesc: TextView
+    private val UNLOCKED_THRESHOLDS_KEY = "unlocked_thresholds"
 
     private fun vibratePhone() {
         val vibrator = getSystemService(Vibrator::class.java)
@@ -67,6 +68,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var brainView: BrainView
+
+    /** namespace any BrainPrefs key by the current brain image */
+    private fun keyForImage(suffix: String): String =
+        "${brainView.getCurrentResId()}_$suffix"
 
     private fun performHardReset() {
         // a) Clear all BrainPrefs (fills, rewired count, timers, saved colors, etc)
@@ -155,12 +160,50 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.brain90 -> {
                         // load the 90-day brain image
+                        // 1) snapshot current fills/timer/rewired
+                        brainView.saveFillsOnExit()
+                        // 2) snapshot current thresholds
+                        getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+                            .edit()
+                            .putStringSet(
+                                keyForImage(UNLOCKED_THRESHOLDS_KEY),
+                                unlockedThresholds.map { it.toString() }.toSet()
+                            )
+                            .apply()
+                        // 3) switch
                         brainView.setBaseImageResource(R.drawable.brain_90)
+                        // 4) reload this new image’s thresholds
+                        runOnUiThread {
+                            val prefs = getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+                            val saved = prefs.getStringSet(keyForImage(UNLOCKED_THRESHOLDS_KEY), emptySet())!!
+                            unlockedThresholds.clear()
+                            unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
+                            updateRank()
+                        }
                         true
                     }
                     R.id.brain45 -> {
                         // load the 45-day brain image
+                        // 1) snapshot current fills/timer/rewired
+                        brainView.saveFillsOnExit()
+                        // 2) snapshot current thresholds
+                        getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+                            .edit()
+                            .putStringSet(
+                                keyForImage(UNLOCKED_THRESHOLDS_KEY),
+                                unlockedThresholds.map { it.toString() }.toSet()
+                            )
+                            .apply()
+                        // 3) switch
                         brainView.setBaseImageResource(R.drawable.brain_45)
+                        // 4) reload this new image’s thresholds
+                        runOnUiThread {
+                            val prefs = getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+                            val saved = prefs.getStringSet(keyForImage(UNLOCKED_THRESHOLDS_KEY), emptySet())!!
+                            unlockedThresholds.clear()
+                            unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
+                            updateRank()
+                        }
                         true
                     }
                     R.id.action_hard_reset -> {
@@ -216,6 +259,13 @@ class MainActivity : AppCompatActivity() {
                 // Compare against its threshold, and if newly unlocked, show fireworks
                 if (count >= achievement.threshold && unlockedThresholds.add(achievement.threshold)) {
                     showFireworks()
+                    // save this updated set back to prefs, namespaced by image
+                    getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+                      .edit()
+                      .putStringSet(keyForImage(UNLOCKED_THRESHOLDS_KEY),
+                        unlockedThresholds.map { it.toString() }.toSet()
+                      )
+                      .apply()
                 }
             }
 
@@ -266,10 +316,11 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        // pull in any thresholds we’d unlocked on THIS brain
+        val prefs = getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+        val saved = prefs.getStringSet(keyForImage(UNLOCKED_THRESHOLDS_KEY), emptySet())!!
         unlockedThresholds.clear()
-        updateRank()
-
-// show the initial rank (probably “Initiate”)
+        unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
         updateRank()
 
     }
@@ -277,6 +328,13 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         brainView.saveFillsOnExit()
+        getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+            .edit()
+            .putStringSet(
+                keyForImage(UNLOCKED_THRESHOLDS_KEY),
+                unlockedThresholds.map { it.toString() }.toSet()
+            )
+            .apply()
     }
 
 

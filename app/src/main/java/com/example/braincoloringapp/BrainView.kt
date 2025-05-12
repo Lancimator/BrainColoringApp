@@ -30,6 +30,8 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val REWIRED_COUNT_KEY = "rewired_count"
     // which drawable is currently loaded
     private var currentResId: Int = R.drawable.brain_90
+    /** so MainActivity can know which brain is active */
+    fun getCurrentResId(): Int = currentResId
 
     /** helper to namespace all keys by image */
     private fun keyFor(imageKey: String) =
