@@ -229,7 +229,9 @@ class MainActivity : AppCompatActivity() {
            // Toast.makeText(this, "Halls of Fame clicked!", Toast.LENGTH_SHORT).show()
 
             // then launch the activity
-            val intent = Intent(this, HallsOfFameActivity::class.java)
+            val intent = Intent(this, HallsOfFameActivity::class.java).apply {
+                putExtra("brain_res_id", brainView.getCurrentResId())
+            }
             startActivity(intent)
         }
         findViewById<Button>(R.id.achievementsButton).setOnClickListener {
@@ -293,7 +295,8 @@ class MainActivity : AppCompatActivity() {
 
             // 3) Prepend it to the existing log
             val hofPrefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
-            val oldLog = hofPrefs.getString("hof_log", "") ?: ""
+            val key = "${brainView.getCurrentResId()}_hof_log"
+            val oldLog = hofPrefs.getString(key, "") ?: ""
             val updatedLog = if (oldLog.isNotEmpty()) {
                 "$newEntry\n\n$oldLog"
             } else {
@@ -302,7 +305,7 @@ class MainActivity : AppCompatActivity() {
 
             // 4) Save the combined log
             hofPrefs.edit()
-                .putString("hof_log", updatedLog)
+                .putString(key, updatedLog)
                 .apply()
 
             // 5) Finally, clear the brain view

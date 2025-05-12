@@ -10,13 +10,15 @@ class HallsOfFameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_halls_of_fame)
 
-        // pull the full log
-        val prefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
-        val hofLog = prefs.getString("hof_log", "") ?: ""
+        // 1) which brain are we showing?
+        val resId = intent.getIntExtra("brain_res_id", R.drawable.brain_90)
 
-        // dump it into the TextView
-        findViewById<TextView>(R.id.hallsOfFameMessage).apply {
-            text = hofLog
-        }
+        // 2) pull only that brain’s log
+        val prefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
+        val hofKey = "${resId}_hof_log"
+        val hofLog = prefs.getString(hofKey, "") ?: ""
+
+        // 3) display
+        findViewById<TextView>(R.id.hallsOfFameMessage).text = hofLog
     }
 }
