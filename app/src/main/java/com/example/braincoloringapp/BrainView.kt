@@ -284,6 +284,31 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         invalidate()
     }
 
+    fun resetCurrentBrain() {
+        // 1) Wipe only this brain’s keys from BrainPrefs
+        val brainPrefs = context.getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
+        val editor = brainPrefs.edit()
+        for (key in brainPrefs.all.keys) {
+            if (key.startsWith("${currentResId}_")) {
+                editor.remove(key)
+            }
+        }
+        editor.apply()
 
+        // 2) Reset the in-memory counters
+        availableFills = 1
+        nextFillTime   = FILL_INTERVAL_SECONDS
+        rewiredCount   = 0
+
+        // 3) Clear the painted bitmap back to the base image
+        val baseBmp = BitmapFactory.decodeResource(context.resources, currentResId)
+        bitmap        = baseBmp
+        mutableBitmap = baseBmp.copy(Bitmap.Config.ARGB_8888, true)
+
+        // 4) Update UI listeners & re-draw
+        fillListener?.invoke(availableFills, nextFillTime)
+        rewiredListener?.invoke(rewiredCount)
+        invalidate()
+    }
 
 }

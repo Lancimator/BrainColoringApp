@@ -256,7 +256,7 @@ class MainActivity : AppCompatActivity() {
                 .apply()
 
             // 5) Finally, clear the brain view
-            brainView.resetImage()
+            brainView.resetCurrentBrain()
 
             // 6) Clear in-memory achievements so we go back to “Initiate”
             unlockedThresholds.clear()
