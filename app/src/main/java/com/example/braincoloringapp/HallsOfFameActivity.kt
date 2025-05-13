@@ -9,6 +9,7 @@ class HallsOfFameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_halls_of_fame)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // 1) which brain are we showing?
         val resId = intent.getIntExtra("brain_res_id", R.drawable.brain_90)
@@ -26,5 +27,9 @@ class HallsOfFameActivity : AppCompatActivity() {
 
         // 3) display
         findViewById<TextView>(R.id.hallsOfFameMessage).text = hofLog
+    }
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 }

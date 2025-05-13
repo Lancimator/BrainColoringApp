@@ -20,11 +20,19 @@
 
         <activity
             android:name=".AchievementsActivity"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity">
+            <!-- Support libraries need this meta-data block -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
 
         <activity
             android:name=".HallsOfFameActivity"
-            android:parentActivityName=".MainActivity"/>
-
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
     </application>
 </manifest>

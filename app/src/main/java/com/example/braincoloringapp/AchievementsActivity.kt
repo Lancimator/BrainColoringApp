@@ -26,6 +26,7 @@ class AchievementsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_achievements)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val brainResId = intent.getIntExtra("brain_res_id", R.drawable.brain_90)
         val title = when (brainResId) {
             R.drawable.brain_90 -> getString(R.string.title_brain_90)
@@ -54,7 +55,7 @@ class AchievementsActivity : AppCompatActivity() {
                 noteView.visibility = View.GONE
             }
         }
-        
+
         updateAchievement(R.id.achievement5, R.id.achievement5_note, rewiredCount >= 5)
         updateAchievement(R.id.achievement10, R.id.achievement10_note, rewiredCount >= 10)
         updateAchievement(R.id.achievement20, R.id.achievement20_note, rewiredCount >= 20)
@@ -66,4 +67,9 @@ class AchievementsActivity : AppCompatActivity() {
 
 
     }
+    override fun onSupportNavigateUp(): Boolean {
+        finish()            // closes this screen
+        return true
+    }
+
 }
