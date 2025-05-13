@@ -24,7 +24,7 @@ import android.widget.Toast
 import android.widget.ImageView
 import androidx.appcompat.widget.PopupMenu
 import com.example.braincoloringapp.FILL_INTERVAL_SECONDS
-
+import android.content.SharedPreferences
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,10 +36,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fillTimer: TextView
     private lateinit var rankTitle: TextView
     private lateinit var rankDesc: TextView
+    private lateinit var brainPrefs: SharedPreferences
     private val UNLOCKED_THRESHOLDS_KEY = "unlocked_thresholds"
 
     companion object {
         private val DEFAULT_BRAIN_RES_ID = R.drawable.brain_90
+        private const val LAST_BRAIN_KEY = "last_brain_res_id"
     }
 
 
@@ -164,10 +166,20 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        brainPrefs = getSharedPreferences("BrainPrefs", MODE_PRIVATE)   // NEW
         rankTitle = findViewById(R.id.rankTitle)
         rankDesc  = findViewById(R.id.rankDesc)
         // existing binding
         brainView = findViewById(R.id.brainView)
+// -------- RESTORE LAST BRAIN --------
+        val savedResId = brainPrefs.getInt(LAST_BRAIN_KEY, brainView.getCurrentResId())
+
+        if (savedResId != brainView.getCurrentResId()) {
+            brainView.setBaseImageResource(savedResId)   // reloads fills & rewired count
+        }
+// update toolbar title now that we know the brain
+        updateActionBarTitle()
+// ------------------------------------
 
         updateActionBarTitle()
 // new bindings
@@ -219,7 +231,11 @@ class MainActivity : AppCompatActivity() {
                             .apply()
                         // 3) switch
                         brainView.setBaseImageResource(R.drawable.brain_90)
+                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_90).apply()
+                        rewiredStatus.text = "Brain cells rewired: ${brainView.getRewiredCount()}"   // NEW
+
                         updateActionBarTitle()
+                        true
                         // 4) reload this new image’s thresholds
                         runOnUiThread {
                             val prefs = getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
@@ -244,6 +260,11 @@ class MainActivity : AppCompatActivity() {
                             .apply()
                         // 3) switch
                         brainView.setBaseImageResource(R.drawable.brain_45)
+                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_45).apply()
+                        rewiredStatus.text = "Brain cells rewired: ${brainView.getRewiredCount()}"   // NEW
+
+                        updateActionBarTitle()
+                        true
                         updateActionBarTitle()
 
                         // 4) reload this new image’s thresholds
@@ -327,6 +348,9 @@ class MainActivity : AppCompatActivity() {
             // Update your rank or whatever next…
             updateRank()
         }
+        // show the value that was loaded from SharedPreferences
+        rewiredStatus.text = "Brain cells rewired: ${brainView.getRewiredCount()}"   // NEW
+
 
 
 
@@ -383,15 +407,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+
+        // 1) persist per-image data
         brainView.saveFillsOnExit()
-        getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
-            .edit()
+
+        // 2) remember which brain was active
+        brainPrefs.edit()
+            .putInt(LAST_BRAIN_KEY, brainView.getCurrentResId())
             .putStringSet(
                 keyForImage(UNLOCKED_THRESHOLDS_KEY),
                 unlockedThresholds.map { it.toString() }.toSet()
             )
             .apply()
+
     }
+
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
