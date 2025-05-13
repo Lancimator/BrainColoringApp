@@ -36,6 +36,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rankDesc: TextView
     private val UNLOCKED_THRESHOLDS_KEY = "unlocked_thresholds"
 
+    private fun updateActionBarTitle() {
+        val titleView = supportActionBar?.customView
+            ?.findViewById<TextView>(R.id.actionbarTitle)
+        val brainName  = resources.getResourceEntryName(brainView.getCurrentResId())
+        titleView?.text      = brainName          // for our custom bar
+        supportActionBar?.title = brainName       // fall-back if a system bar is shown
+    }
+
+
     private fun vibratePhone() {
         val vibrator = getSystemService(Vibrator::class.java)
         if (vibrator?.hasVibrator() == true) {
@@ -127,6 +136,7 @@ class MainActivity : AppCompatActivity() {
         // existing binding
         brainView = findViewById(R.id.brainView)
 
+        updateActionBarTitle()
 // new bindings
         rewiredStatus = findViewById(R.id.rewiredStatus)
         fillCounter    = findViewById(R.id.fillCounter)
@@ -172,6 +182,7 @@ class MainActivity : AppCompatActivity() {
                             .apply()
                         // 3) switch
                         brainView.setBaseImageResource(R.drawable.brain_90)
+                        updateActionBarTitle()
                         // 4) reload this new image’s thresholds
                         runOnUiThread {
                             val prefs = getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
@@ -196,6 +207,8 @@ class MainActivity : AppCompatActivity() {
                             .apply()
                         // 3) switch
                         brainView.setBaseImageResource(R.drawable.brain_45)
+                        updateActionBarTitle()
+
                         // 4) reload this new image’s thresholds
                         runOnUiThread {
                             val prefs = getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
@@ -235,9 +248,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         findViewById<Button>(R.id.achievementsButton).setOnClickListener {
-            val intent = Intent(this, AchievementsActivity::class.java)
-            intent.putExtra("rewiredCount", brainView.getRewiredCount())
+            val intent = Intent(this, AchievementsActivity::class.java).apply {
+                putExtra("rewiredCount", brainView.getRewiredCount())
+                putExtra("brain_res_id",  brainView.getCurrentResId())   // NEW
+            }
             startActivity(intent)
+
         }
 
 

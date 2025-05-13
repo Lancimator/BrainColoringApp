@@ -12,6 +12,7 @@ class HallsOfFameActivity : AppCompatActivity() {
 
         // 1) which brain are we showing?
         val resId = intent.getIntExtra("brain_res_id", R.drawable.brain_90)
+        supportActionBar?.title = resources.getResourceEntryName(resId)
 
         // 2) pull only that brain’s log
         val prefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
