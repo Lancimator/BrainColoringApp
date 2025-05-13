@@ -119,12 +119,14 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/fireworkView"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:visibility="gone"
+        android:background="#80000080"
         app:lottie_rawRes="@raw/fireworks"
         app:lottie_loop="false"
         app:lottie_autoPlay="false" />
+
 
 </RelativeLayout>

@@ -87,16 +87,27 @@ class MainActivity : AppCompatActivity() {
 
     private fun showFireworks() {
         val fireworkView = findViewById<LottieAnimationView>(R.id.fireworkView)
-        fireworkView.visibility = View.VISIBLE
-        fireworkView.playAnimation()
 
-        vibratePhone() // ✅ Add this line
+        // Bring to front & fade-in
+        fireworkView.apply {
+            bringToFront()
+            alpha = 0f
+            visibility = View.VISIBLE
+            animate().alpha(1f).setDuration(200).start()
+            playAnimation()
+        }
 
+        vibratePhone()  // keep the haptic feedback
+
+        // Fade-out and hide after 3 s
         fireworkView.postDelayed({
             fireworkView.cancelAnimation()
-            fireworkView.visibility = View.GONE
-        }, 3000)
+            fireworkView.animate().alpha(0f).setDuration(300)
+                .withEndAction { fireworkView.visibility = View.GONE }
+                .start()
+        }, 2000)
     }
+
 
     private lateinit var brainView: BrainView
 
