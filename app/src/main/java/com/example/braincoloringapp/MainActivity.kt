@@ -1,6 +1,5 @@
 package com.example.braincoloringapp
 
-import com.example.braincoloringapp.ACHIEVEMENTS
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
@@ -308,11 +307,12 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.achievementsButton).setOnClickListener {
             val intent = Intent(this, AchievementsActivity::class.java).apply {
                 putExtra("rewiredCount", brainView.getRewiredCount())
-                putExtra("brain_res_id",  brainView.getCurrentResId())   // NEW
+                putExtra("brain_res_id",  brainView.getCurrentResId())   // ← ensure this line exists
             }
             startActivity(intent)
-
         }
+
+
 
 
 
@@ -331,17 +331,19 @@ class MainActivity : AppCompatActivity() {
             rewiredStatus.text = "Brain cells rewired: $count"
 
             // For each Achievement object…
-            ACHIEVEMENTS.forEach { achievement ->
-                // Compare against its threshold, and if newly unlocked, show fireworks
-                if (count >= achievement.threshold && unlockedThresholds.add(achievement.threshold)) {
+            achievementsFor(brainView.getCurrentResId()).forEach { achievement ->
+                if (count >= achievement.threshold &&
+                    unlockedThresholds.add(achievement.threshold)) {
+
                     showFireworks()
-                    // save this updated set back to prefs, namespaced by image
-                    getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
-                      .edit()
-                      .putStringSet(keyForImage(UNLOCKED_THRESHOLDS_KEY),
-                        unlockedThresholds.map { it.toString() }.toSet()
-                      )
-                      .apply()
+
+                    // persist per-brain
+                    brainPrefs.edit()
+                        .putStringSet(
+                            keyForImage(UNLOCKED_THRESHOLDS_KEY),
+                            unlockedThresholds.map { it.toString() }.toSet()
+                        )
+                        .apply()
                 }
             }
 
