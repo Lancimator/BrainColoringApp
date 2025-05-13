@@ -168,13 +168,4 @@
             android:textSize="16sp" />
     </LinearLayout>
 
-    <!-- BACK button at bottom center -->
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="16dp"/>
 </RelativeLayout>

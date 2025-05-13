@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.Button
 import android.view.View
 
 // 1) A simple data class:
@@ -55,9 +54,7 @@ class AchievementsActivity : AppCompatActivity() {
                 noteView.visibility = View.GONE
             }
         }
-
-
-
+        
         updateAchievement(R.id.achievement5, R.id.achievement5_note, rewiredCount >= 5)
         updateAchievement(R.id.achievement10, R.id.achievement10_note, rewiredCount >= 10)
         updateAchievement(R.id.achievement20, R.id.achievement20_note, rewiredCount >= 20)
@@ -67,11 +64,6 @@ class AchievementsActivity : AppCompatActivity() {
         updateAchievement(R.id.achievement89, R.id.achievement89_note, rewiredCount >= 30)
         updateAchievement(R.id.achievement90, R.id.achievement90_note, rewiredCount >= 30)
 
-
-        val backButton = findViewById<Button>(R.id.backButton)
-        backButton.setOnClickListener {
-            finish()  // closes this activity and returns to MainActivity
-        }
 
     }
 }

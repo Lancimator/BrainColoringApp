@@ -18,7 +18,7 @@ class HallsOfFameActivity : AppCompatActivity() {
             else                -> getString(R.string.app_name)
         }
         supportActionBar?.title = title
-        
+
         // 2) pull only that brain’s log
         val prefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
         val hofKey = "${resId}_hof_log"
