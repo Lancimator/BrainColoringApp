@@ -24,7 +24,12 @@ import android.widget.ImageView
 import androidx.appcompat.widget.PopupMenu
 import com.example.braincoloringapp.FILL_INTERVAL_SECONDS
 import android.content.SharedPreferences
-
+import android.widget.EditText
+import android.view.inputmethod.EditorInfo
+import android.text.method.KeyListener
+import android.graphics.Rect
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 
 class MainActivity : AppCompatActivity() {
     // keep track of which thresholds we’ve celebrated
@@ -37,10 +42,60 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rankDesc: TextView
     private lateinit var brainPrefs: SharedPreferences
     private val UNLOCKED_THRESHOLDS_KEY = "unlocked_thresholds"
+    private lateinit var userNote: EditText
+    private var noteKeyListener: KeyListener? = null
 
     companion object {
         private val DEFAULT_BRAIN_RES_ID = R.drawable.brain_90
         private const val LAST_BRAIN_KEY = "last_brain_res_id"
+        private const val USER_NOTE_SUFFIX = "user_note"
+    }
+    private fun refreshUserNoteField() {
+        val noteKey   = keyForImage(USER_NOTE_SUFFIX)
+        val savedNote = brainPrefs.getString(noteKey, null)
+
+        if (::userNote.isInitialized) {                      // field exists
+            if (savedNote != null) {
+                userNote.setText(savedNote)
+                userNote.isFocusable = false
+            } else {        // ——— FIRST TIME FOR THIS BRAIN ———
+                userNote.apply {
+                    setText("")                   // clear any previous brain’s text
+                    keyListener = noteKeyListener // make editable
+                    isFocusable = true
+                    isFocusableInTouchMode = true
+                }
+
+                // 1) Save & lock when user presses the IME “Done”
+                userNote.setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        lockAndSaveNote()
+                        true
+                    } else false
+                }
+
+                // 2) …or when they simply tap elsewhere and the field loses focus
+                userNote.setOnFocusChangeListener { _, hasFocus ->
+                    if (!hasFocus) lockAndSaveNote()
+                }
+            }
+
+        }
+    }
+
+    private fun lockAndSaveNote() {
+        val text = userNote.text.toString().trim()
+        if (text.isNotEmpty()) {
+            brainPrefs.edit()
+                .putString(keyForImage(USER_NOTE_SUFFIX), text)
+                .apply()
+            userNote.apply {              // lock field
+                keyListener = null
+                isFocusable = false
+                isFocusableInTouchMode = false
+                clearFocus()
+            }
+        }
     }
 
 
@@ -135,6 +190,8 @@ class MainActivity : AppCompatActivity() {
         fillTimer.text       = "Next fill in: ${FILL_INTERVAL_SECONDS}s"
         unlockedThresholds.clear()
         updateRank()
+        refreshUserNoteField()
+
     }
 
     /**
@@ -160,11 +217,30 @@ class MainActivity : AppCompatActivity() {
         rankDesc.text  = descText
     }
 
+    /** Hides keyboard if the current touch is outside any EditText. */
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (ev.action == MotionEvent.ACTION_DOWN) {
+            currentFocus?.let { current ->
+                if (current is EditText) {
+                    val outRect = Rect()
+                    current.getGlobalVisibleRect(outRect)
+                    // touch was outside the EditText?
+                    if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                        current.clearFocus()
+                        (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
+                            .hideSoftInputFromWindow(current.windowToken, 0)
+                    }
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         brainPrefs = getSharedPreferences("BrainPrefs", MODE_PRIVATE)   // NEW
         rankTitle = findViewById(R.id.rankTitle)
         rankDesc  = findViewById(R.id.rankDesc)
@@ -176,6 +252,50 @@ class MainActivity : AppCompatActivity() {
         if (savedResId != brainView.getCurrentResId()) {
             brainView.setBaseImageResource(savedResId)   // reloads fills & rewired count
         }
+// --- one-time note field ---
+        userNote = findViewById(R.id.userNoteEditText)
+        noteKeyListener = userNote.keyListener
+        refreshUserNoteField()
+
+        val savedNote = brainPrefs.getString(USER_NOTE_SUFFIX, null)
+
+        if (savedNote != null) {              // NOTE ALREADY SAVED  → lock field
+            userNote.apply {
+                setText(savedNote)
+                keyListener = null            // disables editing
+                isFocusable = false
+                isFocusableInTouchMode = false
+            }
+        } else {                              // FIRST TIME FOR THIS BRAIN → editable
+            userNote.apply {
+                setText("")                   // clear any previous brain’s text
+                keyListener = noteKeyListener // restore editing
+                isFocusable = true
+                isFocusableInTouchMode = true
+            }
+
+            userNote.setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    val text = userNote.text.toString().trim()
+                    if (text.isNotEmpty()) {
+                        brainPrefs.edit()
+                            .putString(keyForImage(USER_NOTE_SUFFIX), text)
+                            .apply()
+
+                        // lock immediately after saving
+                        userNote.apply {
+                            keyListener = null
+                            isFocusable = false
+                            isFocusableInTouchMode = false
+                        }
+                    }
+                    true
+                } else false
+            }
+        }
+
+// --------------------------------
+
 // update toolbar title now that we know the brain
         updateActionBarTitle()
 // ------------------------------------
@@ -232,6 +352,10 @@ class MainActivity : AppCompatActivity() {
                         brainView.setBaseImageResource(R.drawable.brain_90)
                         brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_90).apply()
                         rewiredStatus.text = "Brain cells rewired: ${brainView.getRewiredCount()}"   // NEW
+                        brainView.setBaseImageResource(R.drawable.brain_90)
+                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_90).apply()
+                        refreshUserNoteField()                // ← NEW
+                        updateActionBarTitle()
 
                         updateActionBarTitle()
                         true
@@ -261,6 +385,10 @@ class MainActivity : AppCompatActivity() {
                         brainView.setBaseImageResource(R.drawable.brain_45)
                         brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_45).apply()
                         rewiredStatus.text = "Brain cells rewired: ${brainView.getRewiredCount()}"   // NEW
+                        brainView.setBaseImageResource(R.drawable.brain_45)
+                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_45).apply()
+                        refreshUserNoteField()                // ← NEW
+                        updateActionBarTitle()
 
                         updateActionBarTitle()
                         true
@@ -389,6 +517,10 @@ class MainActivity : AppCompatActivity() {
 
             // 5) Finally, clear the brain view
             brainView.resetCurrentBrain()
+            refreshUserNoteField()
+            userNote.keyListener            = noteKeyListener
+            userNote.isFocusable            = true
+            userNote.isFocusableInTouchMode = true
 
             // 6) Clear in-memory achievements so we go back to “Initiate”
             unlockedThresholds.clear()
