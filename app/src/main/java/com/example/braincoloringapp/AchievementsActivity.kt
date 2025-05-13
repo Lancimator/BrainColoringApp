@@ -28,7 +28,12 @@ class AchievementsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_achievements)
         val brainResId = intent.getIntExtra("brain_res_id", R.drawable.brain_90)
-        supportActionBar?.title = resources.getResourceEntryName(brainResId)
+        val title = when (brainResId) {
+            R.drawable.brain_90 -> getString(R.string.title_brain_90)
+            R.drawable.brain_45 -> getString(R.string.title_brain_45)
+            else                -> getString(R.string.app_name)
+        }
+        supportActionBar?.title = title
 
         val rewiredCount = intent.getIntExtra("rewiredCount", 0)
 

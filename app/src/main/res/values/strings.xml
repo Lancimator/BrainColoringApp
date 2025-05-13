@@ -11,6 +11,10 @@
     <string name="menu_90_day">90-days brain rewiring</string>
     <string name="menu_45_day">45-days brain rewiring</string>
     <string name="menu_hard_reset">Hard Reset</string>
+    <!-- Brain titles -->
+    <string name="title_brain_90">90-days brain rewiring</string>
+    <string name="title_brain_45">45-days brain rewiring</string>
+
     <string-array name="ranks">
         <item>Initiate – Just getting started; shows potential.</item>
         <item>Apprentice – Learning and growing; dedicated effort.</item>

@@ -25,6 +25,8 @@ import android.widget.ImageView
 import androidx.appcompat.widget.PopupMenu
 import com.example.braincoloringapp.FILL_INTERVAL_SECONDS
 
+
+
 class MainActivity : AppCompatActivity() {
     // keep track of which thresholds we’ve celebrated
     private val unlockedThresholds = mutableSetOf<Int>()
@@ -36,13 +38,33 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rankDesc: TextView
     private val UNLOCKED_THRESHOLDS_KEY = "unlocked_thresholds"
 
-    private fun updateActionBarTitle() {
-        val titleView = supportActionBar?.customView
-            ?.findViewById<TextView>(R.id.actionbarTitle)
-        val brainName  = resources.getResourceEntryName(brainView.getCurrentResId())
-        titleView?.text      = brainName          // for our custom bar
-        supportActionBar?.title = brainName       // fall-back if a system bar is shown
+    companion object {
+        private val DEFAULT_BRAIN_RES_ID = R.drawable.brain_90
     }
+
+
+    private fun titleFor(resId: Int): String = when (resId) {
+        R.drawable.brain_90 -> getString(R.string.title_brain_90)
+        R.drawable.brain_45 -> getString(R.string.title_brain_45)
+        else                -> getString(R.string.app_name)
+    }
+
+    private fun updateActionBarTitle() {
+        val resId = if (::brainView.isInitialized)
+            brainView.getCurrentResId()
+        else
+            DEFAULT_BRAIN_RES_ID
+
+        val title = titleFor(resId)
+
+        supportActionBar?.customView
+            ?.findViewById<TextView>(R.id.actionbarTitle)
+            ?.text = title
+
+        supportActionBar?.title = title
+    }
+
+
 
 
     private fun vibratePhone() {
@@ -156,6 +178,10 @@ class MainActivity : AppCompatActivity() {
             setDisplayShowCustomEnabled(true)
             setCustomView(R.layout.actionbar_custom_title)
         }
+        updateActionBarTitle()            // ← now safe: uses fallback before brainView is init
+
+        brainView = findViewById(R.id.brainView)   // later call will refresh again
+
         // 2) Find the menu icon and attach a PopupMenu
         val menuIcon = supportActionBar?.customView
             ?.findViewById<ImageView>(R.id.menuIcon)
