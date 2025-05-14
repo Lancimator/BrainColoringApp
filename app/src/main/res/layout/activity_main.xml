@@ -3,6 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:padding="24dp"
+    android:clipChildren="false"
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
@@ -146,5 +149,59 @@
         app:lottie_loop="false"
         app:lottie_autoPlay="false" />
 
+    <!-- ①  the little pull-tab, right-hand side, vertically centred -->
+    <TextView
+        android:id="@+id/supportTab"
+        android:layout_width="40dp"
+        android:layout_height="160dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp"
+        android:background="@drawable/support_tab_bg"
+        android:text="S\nu\np\np\no\nr\nt"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:includeFontPadding="false" />
+
+    <!--  ───── NEW SUPPORT OVERLAY GOES HERE ───── -->
+    <FrameLayout
+        android:id="@+id/supportOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/supportScrim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#88000000"/>
+
+        <LinearLayout
+            android:id="@+id/supportPanel"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@drawable/support_tab_bg"
+            android:elevation="6dp">
+
+            <Button
+                android:id="@+id/supportBackBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Back"/>
+
+            <TextView
+                android:id="@+id/supportMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="hello"
+                android:textSize="18sp"/>
+        </LinearLayout>
+    </FrameLayout>
 
 </RelativeLayout>

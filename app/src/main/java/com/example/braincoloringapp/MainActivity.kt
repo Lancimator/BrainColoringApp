@@ -30,6 +30,10 @@ import android.text.method.KeyListener
 import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
+private lateinit var supportTab: TextView
+private lateinit var supportPanel: View
+private lateinit var supportOverlay: View
+private lateinit var supportScrim: View
 
 class MainActivity : AppCompatActivity() {
     // keep track of which thresholds we’ve celebrated
@@ -240,6 +244,39 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        supportTab     = findViewById(R.id.supportTab)
+        supportOverlay = findViewById(R.id.supportOverlay)
+        supportPanel   = findViewById(R.id.supportPanel)
+        supportScrim   = findViewById(R.id.supportScrim)
+        val backBtn    = findViewById<Button>(R.id.supportBackBtn)
+
+        /* bring overlay to topmost */
+        supportOverlay.bringToFront()
+
+        fun openSupport() {
+            supportOverlay.visibility = View.VISIBLE
+            supportPanel.scaleX = 0f
+            supportPanel.scaleY = 0f
+            supportPanel.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(350)
+                .start()
+        }
+
+        fun closeSupport() {
+            supportPanel.animate()
+                .scaleX(0f)
+                .scaleY(0f)
+                .setDuration(250)
+                .withEndAction { supportOverlay.visibility = View.GONE }
+                .start()
+        }
+
+        supportTab.setOnClickListener { openSupport() }
+        backBtn.setOnClickListener   { closeSupport() }
+        supportScrim.setOnClickListener { closeSupport() }   // outside-tap closes
+
 
         brainPrefs = getSharedPreferences("BrainPrefs", MODE_PRIVATE)   // NEW
         rankTitle = findViewById(R.id.rankTitle)
