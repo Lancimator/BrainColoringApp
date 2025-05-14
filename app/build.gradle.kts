@@ -40,4 +40,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
     implementation("com.airbnb.android:lottie:6.3.0")
     implementation(libs.androidx.activity)
+    implementation("com.android.billingclient:billing-ktx:6.1.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 }

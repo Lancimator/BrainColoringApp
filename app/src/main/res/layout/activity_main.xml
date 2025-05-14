@@ -188,6 +188,12 @@
             android:background="@drawable/support_tab_bg"
             android:elevation="6dp">
 
+            <Button
+                android:id="@+id/donateButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Support developer"/>
+
             <TextView
                 android:id="@+id/supportMessage"
                 android:layout_width="wrap_content"

@@ -30,10 +30,17 @@ import android.text.method.KeyListener
 import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
+import com.android.billingclient.api.*
+import android.widget.NumberPicker
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
 private lateinit var supportTab: TextView
 private lateinit var supportPanel: View
 private lateinit var supportOverlay: View
 private lateinit var supportScrim: View
+private lateinit var donateButton: Button
+
 
 class MainActivity : AppCompatActivity() {
     // keep track of which thresholds we’ve celebrated
@@ -54,6 +61,15 @@ class MainActivity : AppCompatActivity() {
         private const val LAST_BRAIN_KEY = "last_brain_res_id"
         private const val USER_NOTE_SUFFIX = "user_note"
     }
+    // Billing
+    private lateinit var billingClient: BillingClient
+    private val skuMap = mapOf(
+        1  to "donate_1",
+        2  to "donate_2",
+        5  to "donate_5",
+        10 to "donate_10"
+    )
+
     private fun refreshUserNoteField() {
         val noteKey   = keyForImage(USER_NOTE_SUFFIX)
         val savedNote = brainPrefs.getString(noteKey, null)
@@ -197,6 +213,63 @@ class MainActivity : AppCompatActivity() {
         refreshUserNoteField()
 
     }
+    private fun showAmountPicker() {
+        val picker = NumberPicker(this).apply {
+            minValue = 1
+            maxValue = 10          // allow €1-10; change as you like
+            wrapSelectorWheel = false
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Choose amount")
+            .setView(picker)
+            .setPositiveButton("Donate") { _, _ ->
+                launchPurchase(picker.value)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun launchPurchase(amount: Int) {
+        val pid = skuMap.filterKeys { it <= amount }.maxByOrNull { it.key }?.value
+        if (pid == null) {
+            Toast.makeText(this, "No product configured for €$amount", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            // suspend call ─ runs safely inside coroutine
+            val productResult = billingClient.queryProductDetails(
+                QueryProductDetailsParams.newBuilder()
+                    .setProductList(
+                        listOf(
+                            QueryProductDetailsParams.Product.newBuilder()
+                                .setProductId(pid)
+                                .setProductType(BillingClient.ProductType.INAPP)
+                                .build()
+                        )
+                    ).build()
+            )
+
+            val details = productResult.productDetailsList?.firstOrNull()
+            if (details == null) {
+                Toast.makeText(this@MainActivity, "Product not found", Toast.LENGTH_LONG).show()
+                return@launch
+            }
+
+            val flowParams = BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(
+                    listOf(
+                        BillingFlowParams.ProductDetailsParams.newBuilder()
+                            .setProductDetails(details)
+                            .build()
+                    )
+                ).build()
+
+            billingClient.launchBillingFlow(this@MainActivity, flowParams)
+        }
+    }
+
 
     /**
      * Chooses a rank string based on how many achievements we’ve unlocked
@@ -251,6 +324,22 @@ class MainActivity : AppCompatActivity() {
 
         /* bring overlay to topmost */
         supportOverlay.bringToFront()
+// ─── set up Google Play Billing ───
+        donateButton = findViewById(R.id.donateButton)
+        donateButton.setOnClickListener { showAmountPicker() }
+
+        billingClient = BillingClient.newBuilder(this)
+            .setListener { billingResult, purchases ->
+                // TODO: handle and acknowledge purchases
+            }
+            .enablePendingPurchases()
+            .build()
+
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(result: BillingResult) { }
+            override fun onBillingServiceDisconnected() { }
+        })
+        donateButton.setOnClickListener { showAmountPicker() }
 
         fun openSupport() {
             supportOverlay.visibility = View.VISIBLE
