@@ -337,71 +337,65 @@ class MainActivity : AppCompatActivity() {
                         true
                     }
                     R.id.brain90 -> {
-                        // load the 90-day brain image
-                        // 1) snapshot current fills/timer/rewired
+                        val newResId = R.drawable.brain_90       // <- ❶ target brain
+
+                        // 1) persist the thresholds of the brain we’re leaving
                         brainView.saveFillsOnExit()
-                        // 2) snapshot current thresholds
-                        getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
-                            .edit()
+                        brainPrefs.edit()
                             .putStringSet(
                                 keyForImage(UNLOCKED_THRESHOLDS_KEY),
                                 unlockedThresholds.map { it.toString() }.toSet()
                             )
                             .apply()
-                        // 3) switch
-                        brainView.setBaseImageResource(R.drawable.brain_90)
-                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_90).apply()
-                        rewiredStatus.text = "Brain cells rewired: ${brainView.getRewiredCount()}"   // NEW
-                        brainView.setBaseImageResource(R.drawable.brain_90)
-                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_90).apply()
-                        refreshUserNoteField()                // ← NEW
-                        updateActionBarTitle()
 
+                        // 2) ***pre-load already-unlocked thresholds for the NEXT brain***
+                        val saved = brainPrefs.getStringSet(
+                            "${newResId}_${UNLOCKED_THRESHOLDS_KEY}", emptySet()
+                        )!!
+                        unlockedThresholds.clear()
+                        unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
+
+                        // 3) now switch bitmaps (this fires `rewiredListener` once)
+                        brainView.setBaseImageResource(newResId)
+                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, newResId).apply()
+
+                        // 4) tidy UI
+                        rewiredStatus.text =
+                            "Brain cells rewired: ${brainView.getRewiredCount()}"
+                        refreshUserNoteField()
                         updateActionBarTitle()
-                        true
-                        // 4) reload this new image’s thresholds
-                        runOnUiThread {
-                            val prefs = getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
-                            val saved = prefs.getStringSet(keyForImage(UNLOCKED_THRESHOLDS_KEY), emptySet())!!
-                            unlockedThresholds.clear()
-                            unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
-                            updateRank()
-                        }
+                        updateRank()
                         true
                     }
                     R.id.brain45 -> {
-                        // load the 45-day brain image
-                        // 1) snapshot current fills/timer/rewired
+                        val newResId = R.drawable.brain_45       // <- ❶ target brain
+
+                        // 1) persist the thresholds of the brain we’re leaving
                         brainView.saveFillsOnExit()
-                        // 2) snapshot current thresholds
-                        getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
-                            .edit()
+                        brainPrefs.edit()
                             .putStringSet(
                                 keyForImage(UNLOCKED_THRESHOLDS_KEY),
                                 unlockedThresholds.map { it.toString() }.toSet()
                             )
                             .apply()
-                        // 3) switch
-                        brainView.setBaseImageResource(R.drawable.brain_45)
-                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_45).apply()
-                        rewiredStatus.text = "Brain cells rewired: ${brainView.getRewiredCount()}"   // NEW
-                        brainView.setBaseImageResource(R.drawable.brain_45)
-                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, R.drawable.brain_45).apply()
-                        refreshUserNoteField()                // ← NEW
-                        updateActionBarTitle()
 
-                        updateActionBarTitle()
-                        true
-                        updateActionBarTitle()
+                        // 2) ***pre-load already-unlocked thresholds for the NEXT brain***
+                        val saved = brainPrefs.getStringSet(
+                            "${newResId}_${UNLOCKED_THRESHOLDS_KEY}", emptySet()
+                        )!!
+                        unlockedThresholds.clear()
+                        unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
 
-                        // 4) reload this new image’s thresholds
-                        runOnUiThread {
-                            val prefs = getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
-                            val saved = prefs.getStringSet(keyForImage(UNLOCKED_THRESHOLDS_KEY), emptySet())!!
-                            unlockedThresholds.clear()
-                            unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
-                            updateRank()
-                        }
+                        // 3) now switch bitmaps (this fires `rewiredListener` once)
+                        brainView.setBaseImageResource(newResId)
+                        brainPrefs.edit().putInt(LAST_BRAIN_KEY, newResId).apply()
+
+                        // 4) tidy UI
+                        rewiredStatus.text =
+                            "Brain cells rewired: ${brainView.getRewiredCount()}"
+                        refreshUserNoteField()
+                        updateActionBarTitle()
+                        updateRank()
                         true
                     }
                     R.id.action_hard_reset -> {
