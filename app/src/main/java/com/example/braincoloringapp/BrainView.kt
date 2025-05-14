@@ -29,6 +29,12 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var rewiredListener: ((Int) -> Unit)? = null
     private val REWIRED_COUNT_KEY = "rewired_count"
     // which drawable is currently loaded
+
+    companion object {
+        /** keeps a fully painted, *ready-to-display* copy of each brain */
+        private val bitmapCache = mutableMapOf<Int, Bitmap>()
+    }
+
     private var currentResId: Int = R.drawable.brain_90
     /** so MainActivity can know which brain is active */
     fun getCurrentResId(): Int = currentResId
@@ -218,6 +224,8 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         prefs.edit()
             .putInt("${currentResId}_${x}_${y}", color)
             .apply()
+        bitmapCache[currentResId] = mutableBitmap   // keep cache in sync
+
 
     }
 
@@ -270,23 +278,33 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
      * (and clear any saved “fills” on top of it).
      */
     fun setBaseImageResource(@DrawableRes resId: Int) {
-        // **1) save the current brain’s fills, timer & rewired count**
+        // 0) if we already have a painted copy -> use it instantly
+        bitmapCache[resId]?.let { cached ->
+            currentResId = resId
+            bitmap       = cached          // display copy
+            mutableBitmap = cached.copy(Bitmap.Config.ARGB_8888, true)
+            loadSavedFills()               // timer & counters only (cheap)
+            invalidate()
+            return                         // skip the expensive path
+        }
+
+        // **1)** save the current brain’s state
         saveFillsOnExit()
-        // 1) remember which image
         currentResId = resId
 
-        // 2) decode new bitmaps
+        // 2) decode clean bitmap and repaint once ↓
         val newBmp = BitmapFactory.decodeResource(context.resources, resId)
-        bitmap = newBmp
+        bitmap        = newBmp
         mutableBitmap = newBmp.copy(Bitmap.Config.ARGB_8888, true)
+        loadSavedFills()
+        loadColors()          // ← heavy only the first time
 
-        // 3) reload per-image state
-        loadSavedFills()  // fills, timer and rewired count
-        loadColors()      // pixel paints
+        // 3) keep a cached copy for next time
+        bitmapCache[resId] = mutableBitmap.copy(Bitmap.Config.ARGB_8888, true)
 
-        // 4) refresh view
         invalidate()
     }
+
 
     fun resetCurrentBrain() {
         // 1) Wipe only this brain’s keys from BrainPrefs
@@ -313,6 +331,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         fillListener?.invoke(availableFills, nextFillTime)
         rewiredListener?.invoke(rewiredCount)
         invalidate()
+        bitmapCache.remove(currentResId)
     }
 
 }
