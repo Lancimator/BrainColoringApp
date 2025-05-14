@@ -15,6 +15,9 @@ val ACHIEVEMENTS_90 = listOf(
     Achievement( 5,  R.id.achievement5,  R.id.achievement5_note),
     Achievement(10,  R.id.achievement10, R.id.achievement10_note),
     Achievement(20,  R.id.achievement20, R.id.achievement20_note),
+    Achievement(25,  R.id.achievement25, R.id.achievement25_note),
+    Achievement(35,  R.id.achievement35, R.id.achievement35_note),
+    Achievement(44,  R.id.achievement44, R.id.achievement44_note),
     Achievement(45,  R.id.achievement45, R.id.achievement45_note),
     Achievement(60,  R.id.achievement60, R.id.achievement60_note),
     Achievement(80,  R.id.achievement80, R.id.achievement80_note),
@@ -30,6 +33,8 @@ val ACHIEVEMENTS_45 = listOf(
     Achievement(44,  R.id.achievement44, R.id.achievement44_note),
     Achievement(45,  R.id.achievement45, R.id.achievement45_note),
 )
+
+
 
 /** helper */
 fun achievementsFor(resId:Int) = when (resId) {
@@ -59,6 +64,15 @@ class AchievementsActivity : AppCompatActivity() {
         val activeIds = achievements
             .flatMap { listOf(it.iconViewId, it.noteViewId) }
             .toSet()
+
+        val allAchievementIds = (ACHIEVEMENTS_90 + ACHIEVEMENTS_45)
+            .flatMap { listOf(it.iconViewId, it.noteViewId) }
+            .toSet()
+
+        allAchievementIds.forEach { id ->
+            findViewById<View>(id).visibility =
+                if (id in activeIds) View.VISIBLE else View.GONE
+        }
 // ----------------------------------------------
 // hide everything, we will unhide only the active list
         // ---------- 2.2: hide only the OTHER brain’s icons ----------
