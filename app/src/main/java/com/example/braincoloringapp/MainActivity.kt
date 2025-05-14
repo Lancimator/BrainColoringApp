@@ -248,7 +248,6 @@ class MainActivity : AppCompatActivity() {
         supportOverlay = findViewById(R.id.supportOverlay)
         supportPanel   = findViewById(R.id.supportPanel)
         supportScrim   = findViewById(R.id.supportScrim)
-        val backBtn    = findViewById<Button>(R.id.supportBackBtn)
 
         /* bring overlay to topmost */
         supportOverlay.bringToFront()
@@ -274,7 +273,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         supportTab.setOnClickListener { openSupport() }
-        backBtn.setOnClickListener   { closeSupport() }
         supportScrim.setOnClickListener { closeSupport() }   // outside-tap closes
 
 
