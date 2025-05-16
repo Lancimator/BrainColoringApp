@@ -10,8 +10,9 @@
         android:id="@+id/brain45"
         android:title="@string/menu_45_day"/>
     <item
-        android:id="@+id/action_settings"
-        android:title="Settings"/>
+        android:id="@+id/action_info"
+        android:title="Info"/>
+
     <!-- new Hard Reset item -->
     <item
         android:id="@+id/action_hard_reset"

@@ -34,6 +34,9 @@ import com.android.billingclient.api.*
 import android.widget.NumberPicker
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import android.view.Gravity
+import android.widget.PopupWindow
+import android.view.WindowManager
 
 private lateinit var supportTab: TextView
 private lateinit var supportPanel: View
@@ -294,6 +297,23 @@ class MainActivity : AppCompatActivity() {
         rankDesc.text  = descText
     }
 
+    private fun showInfoPopup() {
+        val inflater = layoutInflater
+        val popupView = inflater.inflate(R.layout.info_popup, null)
+
+        val popupWindow = PopupWindow(
+            popupView,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            true // focusable = true allows outside touches to dismiss
+        )
+
+        // Optional: center popup
+        val rootView = findViewById<View>(android.R.id.content)
+        popupWindow.showAtLocation(rootView, Gravity.CENTER, 0, 0)
+    }
+
+
     /** Hides keyboard if the current touch is outside any EditText. */
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.action == MotionEvent.ACTION_DOWN) {
@@ -456,8 +476,8 @@ class MainActivity : AppCompatActivity() {
             popup.menuInflater.inflate(R.menu.toolbar_menu, popup.menu)
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    R.id.action_settings -> {
-                        // TODO: launch settings screen
+                    R.id.action_info -> {
+                        showInfoPopup()
                         true
                     }
                     R.id.brain90 -> {
@@ -684,6 +704,10 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_choose_color -> {
                 showColorPicker()
+                true
+            }
+            R.id.action_info -> {
+                showInfoPopup()
                 true
             }
             else -> super.onOptionsItemSelected(item)
