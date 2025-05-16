@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/congratsOverlay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#88000000">
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="#8791FF"
+        android:elevation="6dp">
+
+        <TextView
+            android:id="@+id/congratsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Congratulations! You fully rewired your brain!\n\nYou are really dedicated!\n\nKeep up the good work!"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:gravity="center"/>
+    </LinearLayout>
+</FrameLayout>

@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import android.view.Gravity
 import android.widget.PopupWindow
 import android.view.WindowManager
+import android.graphics.drawable.ColorDrawable
 
 private lateinit var supportTab: TextView
 private lateinit var supportPanel: View
@@ -296,6 +297,25 @@ class MainActivity : AppCompatActivity() {
         rankTitle.text = titleText
         rankDesc.text  = descText
     }
+    private fun showCongratsPopup() {
+        val popupView = layoutInflater.inflate(R.layout.congratulations_popup, null)
+        val popupWindow = PopupWindow(
+            popupView,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            true
+        )
+        popupWindow.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        // Dismiss manually when the background is clicked
+        popupView.findViewById<View>(R.id.congratsOverlay).setOnClickListener {
+            popupWindow.dismiss()
+        }
+
+        val rootView = findViewById<View>(android.R.id.content)
+        popupWindow.showAtLocation(rootView, Gravity.CENTER, 0, 0)
+    }
+
 
     private fun showInfoPopup() {
         val inflater = layoutInflater
@@ -610,6 +630,13 @@ class MainActivity : AppCompatActivity() {
                         )
                         .apply()
                 }
+            }
+            val lastAchievement = brainView.getCurrentResId().let {
+                if (it == R.drawable.brain_45) 45 else 90
+            }
+            if (count >= lastAchievement ) {
+                unlockedThresholds.add(lastAchievement)
+                showCongratsPopup()
             }
 
             // Update your rank or whatever next…
