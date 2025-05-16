@@ -307,7 +307,18 @@ class MainActivity : AppCompatActivity() {
         )
         popupWindow.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        // Dismiss manually when the background is clicked
+        // 🎆 Start firework animation
+        val fireworkView = findViewById<LottieAnimationView>(R.id.fireworkView)
+        fireworkView.visibility = View.VISIBLE
+        fireworkView.playAnimation()
+
+        // 🎆 Stop firework when popup is dismissed
+        popupWindow.setOnDismissListener {
+            fireworkView.cancelAnimation()
+            fireworkView.visibility = View.GONE
+        }
+
+        // 👆 Dismiss popup when background is tapped
         popupView.findViewById<View>(R.id.congratsOverlay).setOnClickListener {
             popupWindow.dismiss()
         }
@@ -315,6 +326,7 @@ class MainActivity : AppCompatActivity() {
         val rootView = findViewById<View>(android.R.id.content)
         popupWindow.showAtLocation(rootView, Gravity.CENTER, 0, 0)
     }
+
 
 
     private fun showInfoPopup() {
