@@ -2,7 +2,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.braincoloringapp">
+    package="com.example.stopaddiction">
     <uses-permission android:name="android.permission.VIBRATE"/>
     <application
         android:icon="@mipmap/ic_launcher"
@@ -10,7 +10,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.stopaddiction.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -19,20 +19,20 @@
         </activity>
 
         <activity
-            android:name=".AchievementsActivity"
-            android:parentActivityName=".MainActivity">
+            android:name="com.example.stopaddiction.AchievementsActivity"
+            android:parentActivityName="com.example.stopaddiction.MainActivity">
             <!-- Support libraries need this meta-data block -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value="com.example.stopaddiction.MainActivity"/>
         </activity>
 
         <activity
-            android:name=".HallsOfFameActivity"
-            android:parentActivityName=".MainActivity">
+            android:name="com.example.stopaddiction.HallsOfFameActivity"
+            android:parentActivityName="com.example.stopaddiction.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value="com.example.stopaddiction.MainActivity"/>
         </activity>
     </application>
 </manifest>
