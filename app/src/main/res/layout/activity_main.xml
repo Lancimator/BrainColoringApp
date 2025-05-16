@@ -1,182 +1,224 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
-    android:padding="24dp"
-    android:clipChildren="false"
+    android:padding="16dp"
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <!-- Toolbar at top -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <TextView
-        android:id="@+id/fillCounter"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Available fills: 1"
-        android:layout_below="@id/main_toolbar"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="8dp"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#DDDDDD"
+        app:layout_constraintTop_toBottomOf="@id/main_toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/fillTimer"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/topCounters"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Next fill in: 10s"
-        android:layout_below="@+id/main_toolbar"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="180dp"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_toolbar"
+        android:layout_marginTop="12dp">
 
-    <!-- Total rewired counter -->
+        <TextView
+            android:id="@+id/fillCounter"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Available rewirings: 1"
+            android:textSize="20sp"/>
+
+        <View
+            android:layout_width="12dp"
+            android:layout_height="0dp" />
+
+        <TextView
+            android:id="@+id/fillTimer"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next: 10s"
+            android:layout_marginStart="12dp"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
     <TextView
         android:id="@+id/rewiredStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Brain cells rewired: 0 out of 90"
-        android:layout_below="@id/fillCounter"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="8dp"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"/>
-
-    <!-- NEW: container for your rank title+desc -->
-    <LinearLayout
-        android:id="@+id/rankContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rewiredStatus"
-        android:layout_marginTop="40dp"
-        android:orientation="vertical"
-        android:gravity="center">
-
-    <!-- 1) Big first word -->
-    <TextView
-        android:id="@+id/rankTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="22sp"
         android:textStyle="bold"
-        android:gravity="center"
-        android:text=""/>
-
-    <!-- 2) Smaller description on next line -->
-    <TextView
-        android:id="@+id/rankDesc"
+        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:text=""/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topCounters"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="12dp"
+        android:text="Brain cells rewired: 0 / 90"
+        android:textSize="20sp"/>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/rankBlock"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rewiredStatus"
+        android:layout_marginTop="32dp">
 
-    <!-- BrainView below the toolbar -->
+        <TextView
+            android:id="@+id/rankTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/rankDesc"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"/>
+    </LinearLayout>
+
     <com.example.braincoloringapp.BrainView
         android:id="@+id/brainView"
-        android:layout_below="@id/main_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/rankBlock"
+        app:layout_constraintBottom_toTopOf="@id/userNoteEditText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <EditText
         android:id="@+id/userNoteEditText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/buttonGroup"
-        android:layout_marginBottom="36dp"
-        android:hint="Enter Goal"
-        android:maxLines="1"
-        android:inputType="textCapSentences"
-        android:gravity="center"
         android:textColor="@android:color/black"
+        android:hint="Enter Goal"
+        android:textSize="32sp"
         android:textStyle="bold"
-        android:textSize="36dp"
-        android:background="@null"
-        android:imeOptions="actionDone"/>
+        android:background="@android:color/transparent"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:maxLines="1"
+        android:importantForAutofill="no"
+        app:layout_constraintTop_toBottomOf="@id/brainView"
+        app:layout_constraintBottom_toTopOf="@id/buttonGroup"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="60dp"/>
+
 
     <LinearLayout
         android:id="@+id/buttonGroup"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:padding="16dp"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:textColor="@android:color/black"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="12dp">
 
         <Button
             android:id="@+id/resetButton"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/reset"/>
 
+        <View
+            android:layout_width="12dp"
+            android:layout_height="0dp" />
+
         <Button
             android:id="@+id/hallsOfFameButton"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/halls_of_fame"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"/>
+            android:text="@string/halls_of_fame"/>
+
+        <View
+            android:layout_width="12dp"
+            android:layout_height="0dp" />
 
         <Button
             android:id="@+id/achievementsButton"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/achievements"/>
-
     </LinearLayout>
 
-
-
-    <com.airbnb.lottie.LottieAnimationView
+   <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/fireworkView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:visibility="gone"
         android:background="#80000080"
         app:lottie_rawRes="@raw/fireworks"
         app:lottie_loop="false"
-        app:lottie_autoPlay="false" />
+        app:lottie_autoPlay="false"/>
 
-    <!-- ①  the little pull-tab, right-hand side, vertically centred -->
-    <TextView
+   <TextView
         android:id="@+id/supportTab"
+        android:textStyle="bold"
         android:layout_width="40dp"
         android:layout_height="160dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="0dp"
-        android:layout_marginRight="0dp"
-        android:background="@drawable/support_tab_bg"
         android:text="S\nu\np\np\no\nr\nt"
+        android:background="@drawable/support_tab_bg"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:gravity="center"
-        android:includeFontPadding="false" />
+        android:includeFontPadding="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <!--  ───── NEW SUPPORT OVERLAY GOES HERE ───── -->
     <FrameLayout
         android:id="@+id/supportOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
 
         <View
             android:id="@+id/supportScrim"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#88000000"/>
+
 
         <LinearLayout
             android:id="@+id/supportPanel"
@@ -199,9 +241,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="hello"
+                android:text="Thank you for considering a donation!"
                 android:textSize="18sp"/>
         </LinearLayout>
     </FrameLayout>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

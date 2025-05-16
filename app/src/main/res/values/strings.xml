@@ -4,7 +4,7 @@
     <string name="reset">Reset</string>
     <string name="achievements">Achievements</string>
     <string name="halls_of_fame_message">
-        Your rewiring journey ended after %1$d fills on %2$s. Next time you will make it longer!
+        Your rewiring journey ended after %1$d rewirings on %2$s. Next time you will make it longer!
     </string>
     <string name="menu">Menu</string>
     <string name="menu_settings">Settings</string>

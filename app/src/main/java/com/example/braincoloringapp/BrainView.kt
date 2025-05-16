@@ -47,11 +47,12 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         this.rewiredListener = listener
     }
 
-    private var fillListener: ((available: Int, nextInSec: Int) -> Unit)? = null
+    private var fillListener: ((available: Int, nextFormatted: String) -> Unit)? = null
 
-    fun setFillListener(listener: (Int, Int) -> Unit) {
-        this.fillListener = listener
+    fun setFillListener(listener: (Int, String) -> Unit) {
+        fillListener = listener
     }
+
     private var celebrationListener: (() -> Unit)? = null
 
     fun setCelebrationListener(listener: () -> Unit) {
@@ -66,7 +67,11 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 availableFills++
                 nextFillTime = FILL_INTERVAL_SECONDS
             }
-            fillListener?.invoke(availableFills, nextFillTime)
+            val hours   = nextFillTime / 3600
+            val minutes = (nextFillTime % 3600) / 60
+            val seconds = nextFillTime % 60
+            val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            fillListener?.invoke(availableFills, formattedTime)
 
             timerHandler.postDelayed(this, 1000)
         }
@@ -115,7 +120,11 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         }
         rewiredCount = prefs.getInt(   keyFor(REWIRED_COUNT_KEY),    0)
         rewiredListener?.invoke(rewiredCount)
-        fillListener?.invoke(availableFills, nextFillTime)
+        val hours   = nextFillTime / 3600
+        val minutes = (nextFillTime % 3600) / 60
+        val seconds = nextFillTime % 60
+        val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        fillListener?.invoke(availableFills, formattedTime)
     }
 
 
@@ -177,7 +186,11 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                     floodFill(mutableBitmap, touchX, touchY, targetColor, selectedColor)
                     saveColor(touchX, touchY, selectedColor)
                     invalidate()
-                    fillListener?.invoke(availableFills, nextFillTime)
+                    val hours   = nextFillTime / 3600
+                    val minutes = (nextFillTime % 3600) / 60
+                    val seconds = nextFillTime % 60
+                    val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+                    fillListener?.invoke(availableFills, formattedTime)
                     rewiredListener?.invoke(rewiredCount)
 
                     if (rewiredCount == 5) {
@@ -213,7 +226,11 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
         // Redraw and update UI
         invalidate()
-        fillListener?.invoke(availableFills, nextFillTime)
+        val hours   = nextFillTime / 3600
+        val minutes = (nextFillTime % 3600) / 60
+        val seconds = nextFillTime % 60
+        val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        fillListener?.invoke(availableFills, formattedTime)
         rewiredListener?.invoke(rewiredCount)
     }
 
@@ -328,7 +345,11 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         mutableBitmap = baseBmp.copy(Bitmap.Config.ARGB_8888, true)
 
         // 4) Update UI listeners & re-draw
-        fillListener?.invoke(availableFills, nextFillTime)
+        val hours   = nextFillTime / 3600
+        val minutes = (nextFillTime % 3600) / 60
+        val seconds = nextFillTime % 60
+        val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        fillListener?.invoke(availableFills, formattedTime)
         rewiredListener?.invoke(rewiredCount)
         invalidate()
         bitmapCache.remove(currentResId)

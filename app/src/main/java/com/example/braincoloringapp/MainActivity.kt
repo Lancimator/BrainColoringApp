@@ -206,8 +206,8 @@ class MainActivity : AppCompatActivity() {
         // d) Reset the view and UI
         brainView.resetImage()
         rewiredStatus.text = "Brain cells rewired: 0"
-        fillCounter.text     = "Available fills: 0"
-        fillTimer.text       = "Next fill in: ${FILL_INTERVAL_SECONDS}s"
+        fillCounter.text     = "Available rewirings: 0"
+        fillTimer.text       = "Next: ${FILL_INTERVAL_SECONDS}s"
         unlockedThresholds.clear()
         updateRank()
         refreshUserNoteField()
@@ -565,12 +565,11 @@ class MainActivity : AppCompatActivity() {
         val fillCounter = findViewById<TextView>(R.id.fillCounter)
         val fillTimer = findViewById<TextView>(R.id.fillTimer)
 
-        brainView.setFillListener { fills, secondsLeft ->
-            runOnUiThread {
-                fillCounter.text = "Available fills: $fills"
-                fillTimer.text = "Next fill in: ${secondsLeft}s"
-            }
+        brainView.setFillListener { available, nextFormatted ->
+            fillCounter.text = "Available rewirings: $available"
+            fillTimer.text = "Next: $nextFormatted"
         }
+
         val rewiredStatus = findViewById<TextView>(R.id.rewiredStatus)
 
         brainView.setRewiredListener { count ->
