@@ -38,13 +38,15 @@ import android.view.WindowManager
 import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import com.android.billingclient.api.BillingClient.*
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.PendingPurchasesParams
 
 private lateinit var supportTab: TextView
 private lateinit var supportPanel: View
 private lateinit var supportOverlay: View
 private lateinit var supportScrim: View
 private lateinit var donateButton: Button
-
+private var isBillingReady = false
 
 class MainActivity : AppCompatActivity() {
     // keep track of which thresholds we’ve celebrated
@@ -122,7 +124,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun handlePurchase(purchase: Purchase) {
+        // Only handle PURCHASED state
+        if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED) return
 
+        // For consumables, consume them so user can repurchase
+        val consumeParams = ConsumeParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+
+        billingClient.consumeAsync(consumeParams) { billingResult, outToken ->
+            if (billingResult.responseCode == BillingResponseCode.OK) {
+                // Grant entitlement to the user (e.g. add “support” credit)
+                Toast.makeText(this, "Thanks for your support!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Consumption failed: ${billingResult.debugMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
     private fun titleFor(resId: Int): String = when (resId) {
         R.drawable.brain_90 -> getString(R.string.title_brain_90)
         R.drawable.brain_45 -> getString(R.string.title_brain_45)
@@ -187,8 +210,25 @@ class MainActivity : AppCompatActivity() {
                 .start()
         }, 2000)
     }
-
-
+    
+    // ① Declare it here:
+    private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
+        when (billingResult.responseCode) {
+            BillingClient.BillingResponseCode.OK -> {
+                purchases?.forEach { handlePurchase(it) }
+            }
+            BillingClient.BillingResponseCode.USER_CANCELED -> {
+                Toast.makeText(this, "Purchase canceled", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                Toast.makeText(
+                    this,
+                    "Error ${billingResult.responseCode}: ${billingResult.debugMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
     private lateinit var brainView: BrainView
 
     /** namespace any BrainPrefs key by the current brain image */
@@ -235,6 +275,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun launchPurchase(amount: Int) {
+        if (!::billingClient.isInitialized) {
+            Toast.makeText(this, "Billing not ready yet", Toast.LENGTH_SHORT).show()
+            return
+        }
         val sku = skuMap.entries.filter { it.key <= amount }.maxByOrNull { it.key }?.value
         if (sku == null) {
             Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show()
@@ -374,51 +418,50 @@ class MainActivity : AppCompatActivity() {
         /* bring overlay to topmost */
         supportOverlay.bringToFront()
 // ─── set up Google Play Billing ───
-        donateButton = findViewById(R.id.donateButton)
-        donateButton.setOnClickListener { showAmountPicker() }
+        // 1. Build the BillingClient
+        // Disable the Donate button until billing is ready
+        val donateButton = findViewById<Button>(R.id.donateButton)
+        donateButton.isEnabled = false
 
-        billingClient = newBuilder(this)
-            .setListener { billingResult, purchases ->
-                purchases?.forEach { purchase ->
-                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                        val consumeParams = ConsumeParams.newBuilder()
-                            .setPurchaseToken(purchase.purchaseToken)
-                            .build()
-
-                        billingClient.consumeAsync(consumeParams) { _, _ ->
-                            // Optional: acknowledge only if not already done
-                            if (!purchase.isAcknowledged) {
-                                val ackParams = AcknowledgePurchaseParams.newBuilder()
-                                    .setPurchaseToken(purchase.purchaseToken)
-                                    .build()
-                                billingClient.acknowledgePurchase(ackParams) {}
-                            }
-                            Log.d("Billing", "Purchase state: ${purchase.purchaseState}, acknowledged: ${purchase.isAcknowledged}")
-
-                            Toast.makeText(this, "Thank you for your support! ❤️", Toast.LENGTH_LONG).show()
-                            findViewById<View>(R.id.supportOverlay)?.visibility = View.GONE
-                        }
-                    }
-
-                }
-            }
-            .enablePendingPurchases()
+        billingClient = BillingClient.newBuilder(this)
+            .setListener(purchasesUpdatedListener)
+            .enablePendingPurchases(
+                PendingPurchasesParams.newBuilder()
+                    .enableOneTimeProducts()
+                    .build()
+            )
             .build()
-
 
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
-                if (billingResult.responseCode == BillingResponseCode.OK) {
-                    Log.d("Billing", "Billing client connected")
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    // Mark billing as ready
+                    isBillingReady = true
+                    // Now re-enable the Donate button
+                    donateButton.isEnabled = true
+                    Toast.makeText(this@MainActivity, "Billing ready", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Billing setup failed: ${billingResult.debugMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
-
             override fun onBillingServiceDisconnected() {
-                Log.w("Billing", "Billing client disconnected")
+                isBillingReady = false
+                donateButton.isEnabled = false
+                Toast.makeText(this@MainActivity, "Billing disconnected", Toast.LENGTH_SHORT).show()
             }
         })
 
-        donateButton.setOnClickListener { showAmountPicker() }
+// Wire the click listener (don’t need to re-set it later)
+        donateButton.setOnClickListener {
+            showAmountPicker()  // inside that, launchPurchase()…
+        }
+
+
+        Toast.makeText(this, "Reached billing logic!", Toast.LENGTH_SHORT).show()
 
         fun openSupport() {
             supportOverlay.visibility = View.VISIBLE
