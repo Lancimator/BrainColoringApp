@@ -40,6 +40,7 @@ import android.util.Log
 import com.android.billingclient.api.BillingClient.*
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.PendingPurchasesParams
+import com.airbnb.lottie.LottieDrawable
 
 private lateinit var supportTab: TextView
 private lateinit var supportPanel: View
@@ -351,6 +352,7 @@ class MainActivity : AppCompatActivity() {
         // 🎆 Start firework animation
         val fireworkView = findViewById<LottieAnimationView>(R.id.fireworkView)
         fireworkView.visibility = View.VISIBLE
+        fireworkView.repeatCount = LottieDrawable.INFINITE   // <- loops forever
         fireworkView.playAnimation()
 
         // 🎆 Stop firework when popup is dismissed
