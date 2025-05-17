@@ -14,18 +14,7 @@
     <!-- Brain titles -->
     <string name="title_brain_90">90-days brain rewiring</string>
     <string name="title_brain_45">45-days brain rewiring</string>
-    <string name="info_popup_text">
-    Every day you can rewire one of your brain cells by coloring it.\n\n
-    Can you make it till the end?\n\n
-    This is great if you want to quit any addiction or achieve your desired goal!\n\n
-    Lets start!  Watching you progressively rewiring your brain is really motivating, trust me!\n\n
-    Click on an empty brain cell every day and color it!\n\n
-    Lets go and start today!
-    </string>
-
-
-
-
+    <string name="info_popup_text">Every day, you can rewire one of your brain cells by coloring it.\n\nCan you make it to the end? This is perfect if you want to quit an addiction or achieve your goals! Let’s start! Watching your progress as you rewire your brain is really motivating—trust me!\n\nJust click on an empty brain cell each day and color it in.\n\nLet’s go—start today!</string>
 
     <string-array name="ranks">
         <item>Initiate – Just getting started; shows potential.</item>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/supportLayout"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="24dp"
+    android:background="@drawable/support_tab_bg"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/supportMessageText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:justificationMode="inter_word"
+        android:text="Thank you for using this app on your journey toward recovery and personal growth. If you’ve found it helpful, I would truly appreciate your support—whether that’s leaving a positive review or making a small contribution* to help keep the project going. Every bit of encouragement means a lot and helps me continue improving the app for everyone."
+        android:textAlignment="center"
+        android:textColor="#333333"
+        android:textSize="16sp"
+        android:layout_marginBottom="20dp"
+        android:paddingBottom="8dp"/>
+    <Button
+        android:id="@+id/support1Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1 Euro - get a coffee"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/support5Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="5 Euro - get a beer"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/support10Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="10 Euro - get two beers"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/support100Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="100 Euro - quit your job"/>
+
+    <TextView
+        android:id="@+id/supportDisclaimerText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:justificationMode="inter_word"
+        android:text="*Your support is completely voluntary and helps to keep this app running. No goods or services will be provided in exchange for your support. Support payments are typically non-refundable. For any questions or issues, please contact us or refer to Google Play support."
+        android:textColor="#333333"
+        android:textSize="10sp"
+        android:layout_marginTop="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="0dp"/>
+</LinearLayout>

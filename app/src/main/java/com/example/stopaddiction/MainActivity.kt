@@ -471,9 +471,6 @@ class MainActivity : AppCompatActivity() {
             showAmountPicker()  // inside that, launchPurchase()…
         }
 
-
-        Toast.makeText(this, "Reached billing logic!", Toast.LENGTH_SHORT).show()
-
         fun openSupport() {
             supportOverlay.visibility = View.VISIBLE
             supportPanel.scaleX = 0f
@@ -494,7 +491,10 @@ class MainActivity : AppCompatActivity() {
                 .start()
         }
 
-        supportTab.setOnClickListener { openSupport() }
+        supportTab.setOnClickListener {
+            showSupportPopup()
+        }
+
         supportScrim.setOnClickListener { closeSupport() }   // outside-tap closes
 
 
@@ -832,6 +832,37 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+    private fun showSupportPopup() {
+        val popupView = layoutInflater.inflate(R.layout.support_popup, null)
+        val popupWindow = PopupWindow(
+            popupView,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            true
+        )
+
+        // Find buttons by their IDs and set click listeners
+        popupView.findViewById<Button>(R.id.support1Button).setOnClickListener {
+            launchPurchase(1)    // Triggers your existing purchase logic for 1 EUR
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<Button>(R.id.support5Button).setOnClickListener {
+            launchPurchase(5)    // Triggers your existing purchase logic for 5 EUR
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<Button>(R.id.support10Button).setOnClickListener {
+            launchPurchase(10)   // Triggers your existing purchase logic for 10 EUR
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<Button>(R.id.support100Button).setOnClickListener {
+            launchPurchase(100)  // Triggers your existing purchase logic for 100 EUR
+            popupWindow.dismiss()
+        }
+
+        // Show the popup window in the center of the screen
+        val rootView = findViewById<View>(android.R.id.content)
+        popupWindow.showAtLocation(rootView, Gravity.CENTER, 0, 0)
     }
 
     private fun showColorPicker() {
