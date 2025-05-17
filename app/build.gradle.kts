@@ -11,7 +11,7 @@ android {
         applicationId = "com.lancimator.stopaddiction"
         minSdk = 23
         targetSdk = 35
-        versionCode = 1000
+        versionCode = 1001
         versionName = "1.0"
     }
 
@@ -27,7 +27,11 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

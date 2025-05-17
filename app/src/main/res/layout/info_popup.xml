@@ -20,5 +20,15 @@
             android:text="@string/info_popup_text"
             android:textColor="@android:color/black"
             android:textSize="16sp" />
+        <TextView
+            android:id="@+id/versionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="bottom"
+            android:text="Version info here" />
     </LinearLayout>
 </FrameLayout>

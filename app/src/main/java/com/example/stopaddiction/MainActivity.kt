@@ -373,7 +373,18 @@ class MainActivity : AppCompatActivity() {
     private fun showInfoPopup() {
         val inflater = layoutInflater
         val popupView = inflater.inflate(R.layout.info_popup, null)
+// --- Get version info dynamically ---
+        val pInfo = packageManager.getPackageInfo(packageName, 0)
+        val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            pInfo.longVersionCode
+        } else {
+            @Suppress("DEPRECATION")
+            pInfo.versionCode.toLong()
+        }
+        val versionName = pInfo.versionName
 
+        val versionTextView = popupView.findViewById<TextView>(R.id.versionTextView)
+        versionTextView.text = "v$versionName (code $versionCode)"
         val popupWindow = PopupWindow(
             popupView,
             WindowManager.LayoutParams.WRAP_CONTENT,
