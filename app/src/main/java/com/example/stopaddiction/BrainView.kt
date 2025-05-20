@@ -1,4 +1,4 @@
-package com.example.braincoloringapp
+package com.example.stopaddiction
 
 import android.content.Context
 import android.graphics.*

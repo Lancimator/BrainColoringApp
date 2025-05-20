@@ -1,4 +1,4 @@
-package com.example.braincoloringapp
+package com.example.stopaddiction
 
 import android.app.AlertDialog
 import android.graphics.Color
@@ -7,7 +7,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import android.widget.TextView
 import com.airbnb.lottie.LottieAnimationView
 import android.view.View
@@ -22,7 +21,6 @@ import android.content.Context
 import android.widget.Toast
 import android.widget.ImageView
 import androidx.appcompat.widget.PopupMenu
-import com.example.braincoloringapp.FILL_INTERVAL_SECONDS
 import android.content.SharedPreferences
 import android.widget.EditText
 import android.view.inputmethod.EditorInfo
@@ -38,13 +36,18 @@ import android.view.Gravity
 import android.widget.PopupWindow
 import android.view.WindowManager
 import android.graphics.drawable.ColorDrawable
+import android.util.Log
+import com.android.billingclient.api.BillingClient.*
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.PendingPurchasesParams
+import com.airbnb.lottie.LottieDrawable
 
 private lateinit var supportTab: TextView
 private lateinit var supportPanel: View
 private lateinit var supportOverlay: View
 private lateinit var supportScrim: View
 private lateinit var donateButton: Button
-
+private var isBillingReady = false
 
 class MainActivity : AppCompatActivity() {
     // keep track of which thresholds we’ve celebrated
@@ -68,10 +71,10 @@ class MainActivity : AppCompatActivity() {
     // Billing
     private lateinit var billingClient: BillingClient
     private val skuMap = mapOf(
-        1  to "donate_1",
-        2  to "donate_2",
-        5  to "donate_5",
-        10 to "donate_10"
+        1  to "support_1",
+        5  to "support_5",
+        10  to "support_10",
+        100 to "support_100"
     )
 
     private fun refreshUserNoteField() {
@@ -122,7 +125,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun handlePurchase(purchase: Purchase) {
+        // Only handle PURCHASED state
+        if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED) return
 
+        // For consumables, consume them so user can repurchase
+        val consumeParams = ConsumeParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+
+        billingClient.consumeAsync(consumeParams) { billingResult, outToken ->
+            if (billingResult.responseCode == BillingResponseCode.OK) {
+                // Grant entitlement to the user (e.g. add “support” credit)
+                Toast.makeText(this, "Thanks for your support!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Consumption failed: ${billingResult.debugMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
     private fun titleFor(resId: Int): String = when (resId) {
         R.drawable.brain_90 -> getString(R.string.title_brain_90)
         R.drawable.brain_45 -> getString(R.string.title_brain_45)
@@ -187,8 +211,25 @@ class MainActivity : AppCompatActivity() {
                 .start()
         }, 2000)
     }
-
-
+    
+    // ① Declare it here:
+    private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
+        when (billingResult.responseCode) {
+            BillingClient.BillingResponseCode.OK -> {
+                purchases?.forEach { handlePurchase(it) }
+            }
+            BillingClient.BillingResponseCode.USER_CANCELED -> {
+                Toast.makeText(this, "Purchase canceled", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                Toast.makeText(
+                    this,
+                    "Error ${billingResult.responseCode}: ${billingResult.debugMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
     private lateinit var brainView: BrainView
 
     /** namespace any BrainPrefs key by the current brain image */
@@ -220,7 +261,7 @@ class MainActivity : AppCompatActivity() {
     private fun showAmountPicker() {
         val picker = NumberPicker(this).apply {
             minValue = 1
-            maxValue = 10          // allow €1-10; change as you like
+            maxValue = 100          // allow €1-100; change as you like
             wrapSelectorWheel = false
         }
 
@@ -235,44 +276,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun launchPurchase(amount: Int) {
-        val pid = skuMap.filterKeys { it <= amount }.maxByOrNull { it.key }?.value
-        if (pid == null) {
-            Toast.makeText(this, "No product configured for €$amount", Toast.LENGTH_LONG).show()
+        if (!::billingClient.isInitialized) {
+            Toast.makeText(this, "Billing not ready yet", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val sku = skuMap.entries.filter { it.key <= amount }.maxByOrNull { it.key }?.value
+        if (sku == null) {
+            Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show()
             return
         }
 
-        lifecycleScope.launch {
-            // suspend call ─ runs safely inside coroutine
-            val productResult = billingClient.queryProductDetails(
-                QueryProductDetailsParams.newBuilder()
-                    .setProductList(
-                        listOf(
-                            QueryProductDetailsParams.Product.newBuilder()
-                                .setProductId(pid)
-                                .setProductType(BillingClient.ProductType.INAPP)
-                                .build()
-                        )
-                    ).build()
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(
+                listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(sku)
+                        .setProductType(ProductType.INAPP)
+                        .build()
+                )
             )
+            .build()
 
-            val details = productResult.productDetailsList?.firstOrNull()
-            if (details == null) {
-                Toast.makeText(this@MainActivity, "Product not found", Toast.LENGTH_LONG).show()
-                return@launch
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
+            if (billingResult.responseCode == BillingResponseCode.OK && productDetailsList.isNotEmpty()) {
+                val productDetails = productDetailsList[0]
+                val productDetailsParamsList = listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails)
+                        .build()
+                )
+                val billingFlowParams = BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(productDetailsParamsList)
+                    .build()
+                billingClient.launchBillingFlow(this, billingFlowParams)
+            } else {
+                Toast.makeText(this, "Failed to fetch donation product", Toast.LENGTH_SHORT).show()
             }
-
-            val flowParams = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(
-                    listOf(
-                        BillingFlowParams.ProductDetailsParams.newBuilder()
-                            .setProductDetails(details)
-                            .build()
-                    )
-                ).build()
-
-            billingClient.launchBillingFlow(this@MainActivity, flowParams)
         }
     }
+
 
 
     /**
@@ -310,6 +352,7 @@ class MainActivity : AppCompatActivity() {
         // 🎆 Start firework animation
         val fireworkView = findViewById<LottieAnimationView>(R.id.fireworkView)
         fireworkView.visibility = View.VISIBLE
+        fireworkView.repeatCount = LottieDrawable.INFINITE   // <- loops forever
         fireworkView.playAnimation()
 
         // 🎆 Stop firework when popup is dismissed
@@ -332,7 +375,18 @@ class MainActivity : AppCompatActivity() {
     private fun showInfoPopup() {
         val inflater = layoutInflater
         val popupView = inflater.inflate(R.layout.info_popup, null)
+// --- Get version info dynamically ---
+        val pInfo = packageManager.getPackageInfo(packageName, 0)
+        val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            pInfo.longVersionCode
+        } else {
+            @Suppress("DEPRECATION")
+            pInfo.versionCode.toLong()
+        }
+        val versionName = pInfo.versionName
 
+        val versionTextView = popupView.findViewById<TextView>(R.id.versionTextView)
+        versionTextView.text = "v$versionName (code $versionCode)"
         val popupWindow = PopupWindow(
             popupView,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -377,21 +431,47 @@ class MainActivity : AppCompatActivity() {
         /* bring overlay to topmost */
         supportOverlay.bringToFront()
 // ─── set up Google Play Billing ───
-        donateButton = findViewById(R.id.donateButton)
-        donateButton.setOnClickListener { showAmountPicker() }
+        // 1. Build the BillingClient
+        // Disable the Donate button until billing is ready
+        val donateButton = findViewById<Button>(R.id.donateButton)
+        donateButton.isEnabled = false
 
         billingClient = BillingClient.newBuilder(this)
-            .setListener { billingResult, purchases ->
-                // TODO: handle and acknowledge purchases
-            }
-            .enablePendingPurchases()
+            .setListener(purchasesUpdatedListener)
+            .enablePendingPurchases(
+                PendingPurchasesParams.newBuilder()
+                    .enableOneTimeProducts()
+                    .build()
+            )
             .build()
 
         billingClient.startConnection(object : BillingClientStateListener {
-            override fun onBillingSetupFinished(result: BillingResult) { }
-            override fun onBillingServiceDisconnected() { }
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    // Mark billing as ready
+                    isBillingReady = true
+                    // Now re-enable the Donate button
+                    donateButton.isEnabled = true
+                    Toast.makeText(this@MainActivity, "Billing ready", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Billing setup failed: ${billingResult.debugMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+            override fun onBillingServiceDisconnected() {
+                isBillingReady = false
+                donateButton.isEnabled = false
+                Toast.makeText(this@MainActivity, "Billing disconnected", Toast.LENGTH_SHORT).show()
+            }
         })
-        donateButton.setOnClickListener { showAmountPicker() }
+
+// Wire the click listener (don’t need to re-set it later)
+        donateButton.setOnClickListener {
+            showAmountPicker()  // inside that, launchPurchase()…
+        }
 
         fun openSupport() {
             supportOverlay.visibility = View.VISIBLE
@@ -413,7 +493,10 @@ class MainActivity : AppCompatActivity() {
                 .start()
         }
 
-        supportTab.setOnClickListener { openSupport() }
+        supportTab.setOnClickListener {
+            showSupportPopup()
+        }
+
         supportScrim.setOnClickListener { closeSupport() }   // outside-tap closes
 
 
@@ -751,6 +834,37 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+    private fun showSupportPopup() {
+        val popupView = layoutInflater.inflate(R.layout.support_popup, null)
+        val popupWindow = PopupWindow(
+            popupView,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            true
+        )
+
+        // Find buttons by their IDs and set click listeners
+        popupView.findViewById<Button>(R.id.support1Button).setOnClickListener {
+            launchPurchase(1)    // Triggers your existing purchase logic for 1 EUR
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<Button>(R.id.support5Button).setOnClickListener {
+            launchPurchase(5)    // Triggers your existing purchase logic for 5 EUR
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<Button>(R.id.support10Button).setOnClickListener {
+            launchPurchase(10)   // Triggers your existing purchase logic for 10 EUR
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<Button>(R.id.support100Button).setOnClickListener {
+            launchPurchase(100)  // Triggers your existing purchase logic for 100 EUR
+            popupWindow.dismiss()
+        }
+
+        // Show the popup window in the center of the screen
+        val rootView = findViewById<View>(android.R.id.content)
+        popupWindow.showAtLocation(rootView, Gravity.CENTER, 0, 0)
     }
 
     private fun showColorPicker() {

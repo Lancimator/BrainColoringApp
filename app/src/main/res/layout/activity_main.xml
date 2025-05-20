@@ -101,7 +101,7 @@
             android:textSize="18sp"/>
     </LinearLayout>
 
-    <com.example.braincoloringapp.BrainView
+    <com.example.stopaddiction.BrainView
         android:id="@+id/brainView"
         android:layout_width="0dp"
         android:layout_height="0dp"

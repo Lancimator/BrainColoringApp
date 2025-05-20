@@ -4,14 +4,14 @@ plugins {
 }
 
 android {
-    namespace = "com.example.braincoloringapp"
+    namespace = "com.example.stopaddiction"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.braincoloringapp"
+        applicationId = "com.lancimator.stopaddiction"
         minSdk = 23
         targetSdk = 35
-        versionCode = 1
+        versionCode = 1005
         versionName = "1.0"
     }
 
@@ -27,7 +27,11 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
@@ -40,6 +44,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
     implementation("com.airbnb.android:lottie:6.3.0")
     implementation(libs.androidx.activity)
-    implementation("com.android.billingclient:billing-ktx:6.1.0")
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 }

@@ -1,4 +1,4 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#6200EE"/>            <!-- your theme’s accent -->
+    <solid android:color="#8791FF"/>            <!-- your theme’s accent -->
     <corners android:radius="6dp"/>
 </shape>

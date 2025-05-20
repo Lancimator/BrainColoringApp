@@ -1,4 +1,4 @@
-package com.example.braincoloringapp
+package com.example.stopaddiction
 
 import android.graphics.Color
 import android.os.Bundle
