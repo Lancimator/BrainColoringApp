@@ -10,7 +10,7 @@ import android.os.Looper
 import android.graphics.BitmapFactory
 import androidx.annotation.DrawableRes
 
-const val FILL_INTERVAL_SECONDS = 2
+const val FILL_INTERVAL_SECONDS = 3600*24
 
 class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val LAST_EXIT_TIME_KEY = "last_exit_time"
@@ -52,6 +52,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     fun setFillListener(listener: (Int, String) -> Unit) {
         fillListener = listener
     }
+
 
     private var celebrationListener: (() -> Unit)? = null
 

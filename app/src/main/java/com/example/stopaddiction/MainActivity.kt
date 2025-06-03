@@ -423,6 +423,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         supportTab     = findViewById(R.id.supportTab)
         supportOverlay = findViewById(R.id.supportOverlay)
         supportPanel   = findViewById(R.id.supportPanel)
@@ -505,6 +506,7 @@ class MainActivity : AppCompatActivity() {
         rankDesc  = findViewById(R.id.rankDesc)
         // existing binding
         brainView = findViewById(R.id.brainView)
+
 // -------- RESTORE LAST BRAIN --------
         val savedResId = brainPrefs.getInt(LAST_BRAIN_KEY, brainView.getCurrentResId())
 
@@ -796,6 +798,27 @@ class MainActivity : AppCompatActivity() {
         unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
         updateRank()
 
+
+        // ─── If this is the very first time the user opens the app, do a hard reset immediately ───
+        val appPrefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        val isFirstLaunch = appPrefs.getBoolean("isFirstLaunch", true)
+        if (isFirstLaunch) {
+            performHardReset()
+            // Show onboarding instructions exactly once:
+            AlertDialog.Builder(this)
+                .setTitle("Welcome")
+                .setMessage(
+                    "• Color a cell every day to track your progress\n" +
+                            "• What progress? You decide:\n" +
+                            "• Fill in the \"Enter goal\" field (Quit smoking, drinking, porn, etc)\n" +
+                            "• Keep up with your activity for 45 or 90 days and you will become a new person!\n" +
+                            "• If you feel like you need to reset your progress, just hit \"Reset\"\n" +
+                            "• Earn achievements by keeping up the progress (and don’t cheat)"
+                )
+                .setPositiveButton("Got it", null)
+                .show()
+            appPrefs.edit().putBoolean("isFirstLaunch", false).apply()
+        }
     }
 
     override fun onPause() {
