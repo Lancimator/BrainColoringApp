@@ -749,46 +749,52 @@ class MainActivity : AppCompatActivity() {
         val resetButton = findViewById<Button>(R.id.resetButton)
 
         resetButton.setOnClickListener {
-            // 1) Grab the final fill count and date
-            val fills = brainView.getRewiredCount()
-            val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-            val endDate = dateFormat.format(Date())
+            AlertDialog.Builder(this)
+                .setTitle("Confirm Reset")
+                .setMessage("Are you sure you want to reset your progress on this brain?")
+                .setPositiveButton("Yes") { _, _ ->
+                    // 1) Grab the final fill count and date
+                    val fills = brainView.getRewiredCount()
+                    val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+                    val endDate = dateFormat.format(Date())
 
-            // 2) Build the new entry
-            val newEntry = getString(
-                R.string.halls_of_fame_message,
-                fills,
-                endDate
-            )
+                    // 2) Build the new entry
+                    val newEntry = getString(
+                        R.string.halls_of_fame_message,
+                        fills,
+                        endDate
+                    )
 
-            // 3) Prepend it to the existing log
-            val hofPrefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
-            val key = "${brainView.getCurrentResId()}_hof_log"
-            val oldLog = hofPrefs.getString(key, "") ?: ""
-            val updatedLog = if (oldLog.isNotEmpty()) {
-                "$newEntry\n\n$oldLog"
-            } else {
-                newEntry
-            }
+                    // 3) Prepend it to the existing log
+                    val hofPrefs = getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
+                    val key = "${brainView.getCurrentResId()}_hof_log"
+                    val oldLog = hofPrefs.getString(key, "") ?: ""
+                    val updatedLog = if (oldLog.isNotEmpty()) {
+                        "$newEntry\n\n$oldLog"
+                    } else {
+                        newEntry
+                    }
 
-            // 4) Save the combined log
-            hofPrefs.edit()
-                .putString(key, updatedLog)
-                .apply()
+                    // 4) Save the combined log
+                    hofPrefs.edit()
+                        .putString(key, updatedLog)
+                        .apply()
 
-            // 5) Finally, clear the brain view
-            brainView.resetCurrentBrain()
-            refreshUserNoteField()
-            userNote.keyListener            = noteKeyListener
-            userNote.isFocusable            = true
-            userNote.isFocusableInTouchMode = true
+                    // 5) Finally, clear the brain view
+                    brainView.resetCurrentBrain()
+                    refreshUserNoteField()
+                    userNote.keyListener            = noteKeyListener
+                    userNote.isFocusable            = true
+                    userNote.isFocusableInTouchMode = true
 
-            // 6) Clear in-memory achievements so we go back to “Initiate”
-            unlockedThresholds.clear()
+                    // 6) Clear in-memory achievements so we go back to “Initiate”
+                    unlockedThresholds.clear()
 
-            // 7) Force the rank TextViews to re-compute (calls updateRank())
-            updateRank()
-
+                    // 7) Force the rank TextViews to re-compute (calls updateRank())
+                    updateRank()
+                }
+                .setNegativeButton("No", null)
+                .show()
         }
 
         // pull in any thresholds we’d unlocked on THIS brain
