@@ -33,6 +33,10 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     companion object {
         /** keeps a fully painted, *ready-to-display* copy of each brain */
         private val bitmapCache = mutableMapOf<Int, Bitmap>()
+        // Add this:
+        fun clearAllCaches() {
+            bitmapCache.clear()
+        }
     }
 
     private var currentResId: Int = R.drawable.brain_90

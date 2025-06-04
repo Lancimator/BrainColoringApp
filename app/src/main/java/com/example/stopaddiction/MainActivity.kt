@@ -41,6 +41,7 @@ import com.android.billingclient.api.BillingClient.*
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.PendingPurchasesParams
 import com.airbnb.lottie.LottieDrawable
+import android.graphics.Bitmap
 
 private lateinit var supportTab: TextView
 private lateinit var supportPanel: View
@@ -236,7 +237,7 @@ class MainActivity : AppCompatActivity() {
     private fun keyForImage(suffix: String): String =
         "${brainView.getCurrentResId()}_$suffix"
 
-    private fun performHardReset() {
+    fun performHardReset() {
         // a) Clear all BrainPrefs (fills, rewired count, timers, saved colors, etc)
         getSharedPreferences("BrainPrefs", Context.MODE_PRIVATE)
             .edit().clear().apply()
@@ -245,19 +246,21 @@ class MainActivity : AppCompatActivity() {
         getSharedPreferences("HallsOfFamePrefs", Context.MODE_PRIVATE)
             .edit().clear().apply()
 
-        // c) Clear any in-memory milestones so fireworks can re-fire
+        // c) Clear in-memory milestones so fireworks can re-fire
         unlockedThresholds.clear()
 
-        // d) Reset the view and UI
+        // NEW: d) Clear all coloring bitmap caches
+        BrainView.clearAllCaches()
+
+        // e) Reset the view and UI for current image
         brainView.resetImage()
         rewiredStatus.text = "Brain cells rewired: 0"
         fillCounter.text     = "Available rewirings: 0"
         fillTimer.text       = "Next: ${FILL_INTERVAL_SECONDS}s"
-        unlockedThresholds.clear()
         updateRank()
         refreshUserNoteField()
-
     }
+
     private fun showAmountPicker() {
         val picker = NumberPicker(this).apply {
             minValue = 1
