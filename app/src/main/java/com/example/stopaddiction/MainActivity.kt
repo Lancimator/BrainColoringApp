@@ -254,8 +254,8 @@ class MainActivity : AppCompatActivity() {
 
         // e) Reset the view and UI for current image
         brainView.resetImage()
-        rewiredStatus.text = "Brain cells rewired: 0"
-        fillCounter.text     = "Available rewirings: 0"
+        rewiredStatus.text = "Habbit streak: 0"
+        fillCounter.text     = "Extend streak by: 0"
         fillTimer.text       = "Next: ${FILL_INTERVAL_SECONDS}s"
         updateRank()
         refreshUserNoteField()
@@ -625,7 +625,7 @@ class MainActivity : AppCompatActivity() {
 
                         // 4) tidy UI
                         rewiredStatus.text =
-                            "Brain cells rewired: ${brainView.getRewiredCount()}"
+                            "Current Streak: ${brainView.getRewiredCount()}"
                         refreshUserNoteField()
                         updateActionBarTitle()
                         updateRank()
@@ -656,7 +656,7 @@ class MainActivity : AppCompatActivity() {
 
                         // 4) tidy UI
                         rewiredStatus.text =
-                            "Brain cells rewired: ${brainView.getRewiredCount()}"
+                            "Current Streak: ${brainView.getRewiredCount()}"
                         refreshUserNoteField()
                         updateActionBarTitle()
                         updateRank()
@@ -706,14 +706,14 @@ class MainActivity : AppCompatActivity() {
         val fillTimer = findViewById<TextView>(R.id.fillTimer)
 
         brainView.setFillListener { available, nextFormatted ->
-            fillCounter.text = "Available rewirings: $available"
+            fillCounter.text = "Extend Streak by: $available"
             fillTimer.text = "Next: $nextFormatted"
         }
 
         val rewiredStatus = findViewById<TextView>(R.id.rewiredStatus)
 
         brainView.setRewiredListener { count ->
-            rewiredStatus.text = "Brain cells rewired: $count"
+            rewiredStatus.text = "Current Streak: $count"
 
             // For each Achievement object…
             achievementsFor(brainView.getCurrentResId()).forEach { achievement ->
@@ -743,7 +743,7 @@ class MainActivity : AppCompatActivity() {
             updateRank()
         }
         // show the value that was loaded from SharedPreferences
-        rewiredStatus.text = "Brain cells rewired: ${brainView.getRewiredCount()}"   // NEW
+        rewiredStatus.text = "Current Streak: ${brainView.getRewiredCount()}"   // NEW
 
 
 
@@ -754,7 +754,7 @@ class MainActivity : AppCompatActivity() {
         resetButton.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Confirm Reset")
-                .setMessage("Are you sure you want to reset your progress on this brain?")
+                .setMessage("Are you sure you want to reset your progress?")
                 .setPositiveButton("Yes") { _, _ ->
                     // 1) Grab the final fill count and date
                     val fills = brainView.getRewiredCount()

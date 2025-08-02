@@ -1,20 +1,20 @@
 <resources>
-    <string name="app_name">NoFaPP</string>
+    <string name="app_name">HabitFlow</string>
     <string name="halls_of_fame">Halls of Fame</string>
     <string name="reset">Reset</string>
     <string name="achievements">Achievements</string>
     <string name="halls_of_fame_message">
-        Your rewiring journey ended after %1$d rewirings on %2$s. Next time you will make it longer!
+        Your current streak ended after %1$d days on %2$s. Next time, keep it going even longer!
     </string>
     <string name="menu">Menu</string>
     <string name="menu_settings">Settings</string>
-    <string name="menu_90_day">90-days brain rewiring</string>
-    <string name="menu_45_day">45-days brain rewiring</string>
+    <string name="menu_90_day">90-days habit challenge</string>
+    <string name="menu_45_day">45-days habit challenge</string>
     <string name="menu_hard_reset">Hard Reset</string>
     <!-- Brain titles -->
-    <string name="title_brain_90">90-days brain rewiring</string>
-    <string name="title_brain_45">45-days brain rewiring</string>
-    <string name="info_popup_text">Every day, you can rewire one of your brain cells by coloring it.\n\nCan you make it to the end? This is perfect if you want to quit an addiction or achieve your goals! Let’s start! Watching your progress as you rewire your brain is really motivating—trust me!\n\nJust click on an empty brain cell each day and color it in.\n\nLet’s go—start today!</string>
+    <string name="title_brain_90">90-days habit challenge</string>
+    <string name="title_brain_45">45-days habit challenge</string>
+    <string name="info_popup_text">Every day, mark your progress by coloring a cell. Can you reach your goal? Perfect for building habits and achieving your personal milestones!</string>
 
     <string-array name="ranks">
         <item>Initiate – Just getting started; shows potential.</item>

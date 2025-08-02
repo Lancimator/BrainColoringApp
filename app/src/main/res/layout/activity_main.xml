@@ -70,7 +70,7 @@
         app:layout_constraintTop_toBottomOf="@id/topCounters"
         android:layout_marginTop="12dp"
         android:layout_marginStart="12dp"
-        android:text="Brain cells rewired: 0 / 90"
+        android:text="Current Streak: 0 / 90"
         android:textSize="20sp"/>
 
     <LinearLayout
