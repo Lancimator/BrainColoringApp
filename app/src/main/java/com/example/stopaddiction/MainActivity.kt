@@ -254,7 +254,7 @@ class MainActivity : AppCompatActivity() {
 
         // e) Reset the view and UI for current image
         brainView.resetImage()
-        rewiredStatus.text = "Habbit streak: 0"
+        rewiredStatus.text = "Streak reached: 0"
         fillCounter.text     = "Extend streak by: 0"
         fillTimer.text       = "Next: ${FILL_INTERVAL_SECONDS}s"
         updateRank()
