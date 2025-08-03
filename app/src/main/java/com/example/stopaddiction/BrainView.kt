@@ -88,7 +88,6 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     init {
         loadBitmap()
         loadSavedFills()
-        startFillTimer()
     }
 
     fun saveFillsOnExit() {

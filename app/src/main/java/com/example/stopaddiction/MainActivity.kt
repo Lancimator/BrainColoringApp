@@ -838,6 +838,7 @@ class MainActivity : AppCompatActivity() {
                 .show()
             appPrefs.edit().putBoolean("isFirstLaunch", false).apply()
         }
+        brainView.startFillTimer()
     }
     override fun onResume() {
         super.onResume()
