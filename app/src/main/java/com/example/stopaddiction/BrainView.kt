@@ -47,6 +47,9 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private fun keyFor(imageKey: String) =
         "${currentResId}_$imageKey"
 
+    fun stopFillTimer() {
+        timerHandler.removeCallbacks(fillRunnable)
+    }
     fun setRewiredListener(listener: (Int) -> Unit) {
         this.rewiredListener = listener
     }
@@ -90,11 +93,13 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     fun saveFillsOnExit() {
         prefs.edit()
-            .putInt(   keyFor(FILL_COUNT_KEY),    availableFills)
-            .putLong(  keyFor(LAST_EXIT_TIME_KEY), System.currentTimeMillis())
-            .putInt(   keyFor(REWIRED_COUNT_KEY), rewiredCount)
+            .putInt(keyFor(FILL_COUNT_KEY), availableFills)
+            .putInt(keyFor("next_fill_time"), nextFillTime) // ADD THIS LINE
+            .putLong(keyFor(LAST_EXIT_TIME_KEY), System.currentTimeMillis())
+            .putInt(keyFor(REWIRED_COUNT_KEY), rewiredCount)
             .apply()
     }
+
 
     fun getRewiredCount(): Int {
         return rewiredCount
@@ -105,14 +110,14 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         selectedColor = color
     }
 
-    private fun startFillTimer() {
+    fun startFillTimer() {
         timerHandler.post(fillRunnable)
     }
 
     private fun loadSavedFills() {
-        val lastTime = prefs.getLong(   keyFor(LAST_EXIT_TIME_KEY), -1L)
-        availableFills = prefs.getInt(  keyFor(FILL_COUNT_KEY),     1)
-
+        val lastTime = prefs.getLong(keyFor(LAST_EXIT_TIME_KEY), -1L)
+        availableFills = prefs.getInt(keyFor(FILL_COUNT_KEY), 1)
+        nextFillTime = prefs.getInt(keyFor("next_fill_time"), FILL_INTERVAL_SECONDS)
 
         if (lastTime != -1L) {
             val now = System.currentTimeMillis()
@@ -121,9 +126,11 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             val leftover = elapsedSeconds % FILL_INTERVAL_SECONDS
 
             availableFills += newFills
-            nextFillTime = if (leftover == 0) FILL_INTERVAL_SECONDS else FILL_INTERVAL_SECONDS - leftover
+            nextFillTime = if (leftover == 0) FILL_INTERVAL_SECONDS else nextFillTime - leftover
+            if (nextFillTime <= 0) nextFillTime = FILL_INTERVAL_SECONDS
         }
-        rewiredCount = prefs.getInt(   keyFor(REWIRED_COUNT_KEY),    0)
+
+        rewiredCount = prefs.getInt(keyFor(REWIRED_COUNT_KEY), 0)
         rewiredListener?.invoke(rewiredCount)
         val hours   = nextFillTime / 3600
         val minutes = (nextFillTime % 3600) / 60
@@ -131,6 +138,7 @@ class BrainView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
         fillListener?.invoke(availableFills, formattedTime)
     }
+
 
 
     private fun loadBitmap(applySavedColors: Boolean = true) {

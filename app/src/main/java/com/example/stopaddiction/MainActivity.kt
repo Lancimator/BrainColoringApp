@@ -602,7 +602,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.brain90 -> {
                         val newResId = R.drawable.brain_90       // <- ❶ target brain
-
+                        if (brainView.getCurrentResId() == newResId) {
+                            // Already showing this brain — do nothing
+                            return@setOnMenuItemClickListener true
+                        }
                         // 1) persist the thresholds of the brain we’re leaving
                         brainView.saveFillsOnExit()
                         brainPrefs.edit()
@@ -620,7 +623,9 @@ class MainActivity : AppCompatActivity() {
                         unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
 
                         // 3) now switch bitmaps (this fires `rewiredListener` once)
+                        brainView.stopFillTimer()
                         brainView.setBaseImageResource(newResId)
+                        brainView.startFillTimer()
                         brainPrefs.edit().putInt(LAST_BRAIN_KEY, newResId).apply()
 
                         // 4) tidy UI
@@ -633,7 +638,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.brain45 -> {
                         val newResId = R.drawable.brain_45       // <- ❶ target brain
-
+                        if (brainView.getCurrentResId() == newResId) {
+                            // Already showing this brain — do nothing
+                            return@setOnMenuItemClickListener true
+                        }
                         // 1) persist the thresholds of the brain we’re leaving
                         brainView.saveFillsOnExit()
                         brainPrefs.edit()
@@ -651,7 +659,9 @@ class MainActivity : AppCompatActivity() {
                         unlockedThresholds.addAll(saved.mapNotNull { it.toIntOrNull() })
 
                         // 3) now switch bitmaps (this fires `rewiredListener` once)
+                        brainView.stopFillTimer()
                         brainView.setBaseImageResource(newResId)
+                        brainView.startFillTimer()
                         brainPrefs.edit().putInt(LAST_BRAIN_KEY, newResId).apply()
 
                         // 4) tidy UI
@@ -829,12 +839,17 @@ class MainActivity : AppCompatActivity() {
             appPrefs.edit().putBoolean("isFirstLaunch", false).apply()
         }
     }
+    override fun onResume() {
+        super.onResume()
+        brainView.startFillTimer()
+    }
 
     override fun onPause() {
         super.onPause()
 
         // 1) persist per-image data
         brainView.saveFillsOnExit()
+        brainView.stopFillTimer()   // <--- ADD THIS LINE
 
         // 2) remember which brain was active
         brainPrefs.edit()
