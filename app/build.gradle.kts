@@ -11,7 +11,7 @@ android {
         applicationId = "com.lancimator.stopaddiction"
         minSdk = 23
         targetSdk = 35
-        versionCode = 1007
+        versionCode = 1010
         versionName = "1.0"
     }
 
