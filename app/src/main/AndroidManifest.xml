@@ -7,7 +7,7 @@
     <uses-permission android:name="com.android.vending.BILLING" />
     <application
         android:icon="@mipmap/ic_launcher"
-        android:label="StopAddiction"
+        android:label="HabitFlow"
         android:theme="@style/AppTheme">
 
         <activity
