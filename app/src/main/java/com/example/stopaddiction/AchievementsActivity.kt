@@ -2,6 +2,9 @@ package com.example.stopaddiction
 
 import android.graphics.Color
 import android.os.Bundle
+import androidx.core.view.WindowCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
@@ -48,7 +51,18 @@ class AchievementsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_achievements)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        
+        // Edge-to-edge layout & insets padding
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val root = findViewById<android.view.View>(R.id.root)
+        if (root != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
+                val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+                insets
+            }
+        }
+supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val brainResId   = intent.getIntExtra("brain_res_id", R.drawable.brain_90)
         val title = when (brainResId) {
             R.drawable.brain_90 -> getString(R.string.title_brain_90)

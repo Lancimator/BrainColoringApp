@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    
+    tools:context=".MainActivity" android:id="@+id/root" android:background="@color/app_background">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_toolbar"

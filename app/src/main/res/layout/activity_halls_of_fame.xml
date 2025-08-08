@@ -3,7 +3,7 @@
     android:id="@+id/hallsOfFameRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HallsOfFameActivity">
+    tools:context=".HallsOfFameActivity" android:background="@color/app_background">
 
     <!-- Fixed title at top -->
     <TextView
